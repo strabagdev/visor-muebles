@@ -497,7 +497,7 @@ footer{
     openModal('Despiece', `
       <table class="table">
         <thead><tr><th>Código</th><th>Pieza</th><th>Cant.</th><th>Medida</th></tr></thead>
-        <tbody>${cutList().map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td>${x[2]}</td>${x[3]}</tr>`).join('');
+        <tbody>${cutList().map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td><td>${x[2]}</td><td>${x[3]}</td></tr>`).join('')}</tbody>
       </table>
     `);
   }
@@ -555,7 +555,7 @@ footer{
     $('prD').textContent=`${a.D} mm`;
     $('prH').textContent=`${a.H} mm`;
     $('prLeg').textContent=`${a.legW.toFixed(1)} × ${a.legD.toFixed(1)} mm`;
-    $('prCutList').innerHTML=cutList().map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td><td>${x[2]}</td>${x[3]}</tr>`).join('');
+    $('prCutList').innerHTML=cutList().map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td><td>${x[2]}</td><td>${x[3]}</td></tr>`).join('');
     $('prGeometry').innerHTML=
       `Altura pata: <strong>${b.legH}</strong><br>`+
       `Luz longitudinal: <strong>${b.long.toFixed(1)}</strong><br>`+
@@ -577,7 +577,7 @@ footer{
         <button id="expClose">Cerrar</button>
       </div>
     `);
-    $('expCsv ).onclick=()=>{
+    $('expCsv').onclick=()=>{
       const rows=[['Codigo','Pieza','Cantidad','Medida'],...cutList()];
       download('despiece_isla.csv','text/csv;charset=utf-8',rows.map(r=>r.join(';')).join('\n'));
     };
