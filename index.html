@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Isla comedor · visor fijo v11</title>
+<style>
+:root{
+  --bg:#efede9;
+  --panel:#ffffff;
+  --panel2:#f8f7f4;
+  --line:#d8d3cb;
+  --text:#1f1f1f;
+  --muted:#6d685f;
+  --sel:#f59e0b;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+button{appearance:none;border:1px solid var(--line);background:#fff;color:#161616;border-radius:8px;padding:8px 10px;font-size:13px;font-weight:650;cursor:pointer;white-space:nowrap}
+button:hover{background:#f3f0eb}
+button.active{background:#181818;color:#fff;border-color:#181818}
+
+#app{width:100%;height:100%;display:grid;grid-template-rows:54px minmax(0,1fr) 34px}
+header{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:8px 12px;border-bottom:1px solid var(--line);background:#f7f5f1;
+}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand h1{margin:0;font-size:18px;line-height:1}
+.brand .meta{font-size:12px;color:var(--muted)}
+.header-actions{display:flex;align-items:center;gap:6px}
+
+.main{
+  min-height:0;
+  display:grid;
+  grid-template-columns:230px minmax(0,1fr) 260px;
+  gap:8px;
+  padding:8px;
+}
+.side,.center{
+  min-height:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden
+}
+.side{display:flex;flex-direction:column}
+.side-head{
+  height:38px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 10px;border-bottom:1px solid var(--line);background:var(--panel2);
+  font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em
+}
+.left-body{padding:9px 10px;display:grid;gap:7px}
+.info-box{
+  border:1px solid var(--line);background:var(--panel2);border-radius:9px;padding:8px;font-size:11px;color:var(--muted);line-height:1.45
+}
+.quick{
+  display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:3px
+}
+.center{display:grid;grid-template-rows:40px minmax(0,1fr)}
+.viewer-toolbar{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:5px 7px;border-bottom:1px solid var(--line);background:var(--panel2)
+}
+.viewer-toolbar .left,.viewer-toolbar .right{display:flex;gap:5px;align-items:center}
+.viewer-toolbar button{padding:6px 8px;font-size:12px}
+#stage{min-height:0;position:relative}
+#stage canvas{display:block;width:100%;height:100%}
+.hud{
+  position:absolute;left:10px;bottom:10px;display:flex;gap:6px;pointer-events:none
+}
+.hud-chip{
+  background:rgba(255,255,255,.92);border:1px solid rgba(180,180,180,.6);border-radius:8px;
+  padding:5px 7px;font-size:11px;color:#555;backdrop-filter:blur(6px)
+}
+.parts{
+  padding:7px;display:grid;gap:5px;align-content:start;overflow:auto
+}
+.part{
+  border:1px solid var(--line);border-radius:8px;padding:7px 8px;background:#fff;cursor:pointer
+}
+.part:hover{background:#f7f5f1}
+.part.selected{border-color:var(--sel);box-shadow:0 0 0 2px rgba(245,158,11,.16)}
+.part-top{display:flex;justify-content:space-between;gap:6px;align-items:center}
+.part-code{font-size:10px;color:var(--muted);font-weight:800}
+.part-name{font-size:12px;font-weight:750}
+.part-dim{font-size:10px;color:var(--muted);margin-top:2px}
+.part-actions{
+  margin-top:auto;padding:7px;border-top:1px solid var(--line);
+  display:grid;grid-template-columns:1fr 1fr;gap:5px;background:var(--panel2)
+}
+.part-actions button{padding:7px;font-size:11px}
+footer{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:0 12px;border-top:1px solid var(--line);background:#f7f5f1;font-size:11px;color:var(--muted)
+}
+
+/* Modal */
+.modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.34);display:none;align-items:center;justify-content:center;padding:24px;z-index:20
+}
+.modal.open{display:flex}
+.modal-card{
+  width:min(760px,92vw);max-height:82vh;overflow:auto;background:#fff;border-radius:14px;border:1px solid var(--line);
+  box-shadow:0 20px 60px rgba(0,0,0,.25)
+}
+.modal-head{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line)
+}
+.modal-head h2{margin:0;font-size:17px}
+.modal-body{padding:14px}
+.modal-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.card{border:1px solid var(--line);border-radius:9px;padding:9px;background:#faf9f7;font-size:12px}
+.table{width:100%;border-collapse:collapse;font-size:12px}
+.table th,.table td{text-align:left;padding:7px;border-bottom:1px solid var(--line)}
+.export-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.export-grid button{padding:12px}
+
+#printReport{display:none}
+
+@media print{
+  @page{size:A4 portrait;margin:10mm}
+  html,body{width:auto;height:auto;overflow:visible!important;background:#fff!important;color:#111!important}
+  #app,.modal{display:none!important}
+  #printReport{display:block!important;width:100%;font-family:Arial,Helvetica,sans-serif;color:#111}
+  .pr-header{
+    display:flex;justify-content:space-between;align-items:flex-end;gap:12px;
+    border-bottom:2px solid #111;padding-bottom:5mm;margin-bottom:5mm;
+  }
+  .pr-title{font-size:20pt;font-weight:700;line-height:1.1}
+  .pr-sub{font-size:9pt;color:#555;margin-top:2mm}
+  .pr-id{font-size:8.5pt;color:#555;text-align:right}
+  .pr-figure{
+    width:100%;height:108mm;display:flex;align-items:center;justify-content:center;
+    border:0.3mm solid #bbb;background:#fafafa;margin-bottom:5mm;overflow:hidden;
+  }
+  .pr-figure img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+  .pr-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:3mm;margin-bottom:5mm}
+  .pr-kpi{border:0.25mm solid #bbb;padding:2.5mm;min-height:16mm}
+  .pr-kpi strong{display:block;font-size:10pt}
+  .pr-kpi span{font-size:8pt;color:#555}
+  .pr-section{margin-top:4mm}
+  .pr-section h2{font-size:11pt;margin:0 0 2.5mm;padding-bottom:1.5mm;border-bottom:0.25mm solid #aaa}
+  .pr-table{width:100%;border-collapse:collapse;font-size:8.5pt}
+  .pr-table th,.pr-table td{border:0.25mm solid #bbb;padding:2mm 2.2mm;text-align:left;vertical-align:top}
+  .pr-table th{background:#efefef}
+  .pr-notes{margin-top:4mm;display:grid;grid-template-columns:1fr 1fr;gap:3mm;font-size:8.5pt}
+  .pr-note{border:0.25mm solid #bbb;padding:2.5mm;min-height:20mm}
+  .pr-footer{
+    margin-top:5mm;padding-top:2mm;border-top:0.25mm solid #bbb;font-size:7.5pt;color:#666;
+    display:flex;justify-content:space-between;
+  }
+}
+
+@media(max-width:1100px){
+  .main{grid-template-columns:210px minmax(0,1fr) 225px}
+  .brand .meta{display:none}
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="brand">
+      <h1>Isla comedor</h1>
+      <div class="meta">1500 × 700 × 900 mm · patas 3×3" · cubierta 30 mm</div>
+    </div>
+    <div class="header-actions">
+      <button id="btnDespiece">Despiece</button>
+      <button id="btnDetalles">Detalles</button>
+      <button id="btnExportar">Exportar</button>
+    </div>
+  </header>
+
+  <main class="main">
+    <aside class="side">
+      <div class="side-head"><span>Especificación</span><span>fija</span></div>
+      <div class="left-body">
+        <div class="info-box"><strong>Medidas generales</strong><br>
+          Largo: 1500 mm<br>
+          Profundidad: 700 mm<br>
+          Altura total: 900 mm
+        </div>
+        <div class="info-box"><strong>Patas</strong><br>
+          3×3" = 76,2 × 76,2 mm<br>
+          Altura: 870 mm
+        </div>
+        <div class="info-box"><strong>Cubierta</strong><br>
+          1500 × 700 × 30 mm
+        </div>
+        <div class="info-box"><strong>Apoyapiés</strong><br>
+          2×2" = 50,8 × 50,8 mm<br>
+          Centro a 220 mm del piso
+        </div>
+        <div class="info-box"><strong>Travesaños superiores</strong><br>
+          Sección: 70 × 30 mm
+        </div>
+        <div class="info-box"><strong>Refuerzo sugerido</strong><br>
+          Escuadras interiores bajo la cubierta<br>
+          4 unidades
+        </div>
+        <div class="quick">
+          <button id="btnExplode">Explotada</button>
+          <button id="btnFit">Encajar</button>
+        </div>
+        <div id="summary" class="info-box"></div>
+      </div>
+    </aside>
+
+    <section class="center">
+      <div class="viewer-toolbar">
+        <div class="left">
+          <button data-view="iso" class="active">ISO</button>
+          <button data-view="front">Frente</button>
+          <button data-view="back">Atrás</button>
+          <button data-view="left">Izq.</button>
+          <button data-view="right">Der.</button>
+          <button data-view="top">Arriba</button>
+        </div>
+        <div class="right">
+          <button id="btnClearSel">Quitar selección</button>
+        </div>
+      </div>
+      <div id="stage">
+        <div class="hud">
+          <div class="hud-chip">Arrastra: rotar</div>
+          <div class="hud-chip">Rueda: zoom</div>
+          <div class="hud-chip">Doble clic: seleccionar</div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="side">
+      <div class="side-head"><span>Piezas</span><span id="partsCount">0</span></div>
+      <div id="partsList" class="parts"></div>
+      <div class="part-actions">
+        <button id="btnIsolate">Aislar</button>
+        <button id="btnHide">Ocultar</button>
+        <button id="btnShowAll">Mostrar todo</button>
+        <button id="btnPartModal">Ver detalle</button>
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    <span id="status">Inicializando visor…</span>
+    <span>Three.js · medidas reales en mm</span>
+  </footer>
+</div>
+
+<section id="printReport">
+  <div class="pr-header">
+    <div>
+      <div class="pr-title">Isla comedor - ficha de fabricación</div>
+      <div id="prSubtitle" class="pr-sub"></div>
+    </div>
+    <div class="pr-id">Modelo paramétrico<br>Vista isométrica</div>
+  </div>
+
+  <div class="pr-figure">
+    <img id="prImage" alt="Vista isométrica de la isla comedor">
+  </div>
+
+  <div class="pr-kpis">
+    <div class="pr-kpi"><strong id="prL"></strong><span>Largo total</span></div>
+    <div class="pr-kpi"><strong id="prD"></strong><span>Profundidad</span></div>
+    <div class="pr-kpi"><strong id="prH"></strong><span>Altura total</span></div>
+    <div class="pr-kpi"><strong id="prLeg"></strong><span>Sección patas</span></div>
+  </div>
+
+  <div class="pr-section">
+    <h2>Despiece</h2>
+    <table class="pr-table">
+      <thead><tr><th>Código</th><th>Pieza</th><th>Cant.</th><th>Medida</th></tr></thead>
+      <tbody id="prCutList"></tbody>
+    </table>
+  </div>
+
+  <div class="pr-notes">
+    <div class="pr-note">
+      <strong>Geometría</strong>
+      <div id="prGeometry" style="margin-top:2mm"></div>
+    </div>
+    <div class="pr-note">
+      <strong>Configuración</strong>
+      <div id="prConfig" style="margin-top:2mm"></div>
+    </div>
+  </div>
+
+  <div class="pr-footer">
+    <span>Documento generado desde el modelo paramétrico.</span>
+    <span>Todas las medidas en mm.</span>
+  </div>
+</section>
+
+<div id="modal" class="modal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2 id="modalTitle">Detalle</h2>
+      <button id="modalClose">Cerrar</button>
+    </div>
+    <div id="modalBody" class="modal-body"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const stage=$('stage');
+  const modal=$('modal');
+  const modalTitle=$('modalTitle');
+  const modalBody=$('modalBody');
+
+  if(typeof THREE==='undefined' || typeof THREE.OrbitControls==='undefined'){
+    stage.innerHTML='<div style="padding:20px;color:#8a2a2a">No se pudo cargar Three.js. Este HTML necesita internet para el visor 3D.</div>';
+    $('status').textContent='Error al cargar Three.js';
+    return;
+  }
+
+  function P(){
+    return {L:1500,D:700,H:900,legW:76.2,legD:76.2,top:30,foot:50.8,footY:220};
+  }
+  function DD(a){ return {legH:a.H-a.top,long:a.L-2*a.legW,short:a.D-2*a.legD}; }
+
+  function partDefs(){
+    const a=P(), b=DD(a), x=a.L/2-a.legW/2, z=a.D/2-a.legD/2;
+    return [
+      {id:'P01',code:'P01',name:'Cubierta',size:[a.L,a.top,a.D],pos:[0,a.H-a.top/2,0],explode:[0,180,0]},
+      {id:'P02-FL',code:'P02',name:'Pata frontal izquierda',size:[a.legW,b.legH,a.legD],pos:[-x,b.legH/2,z],explode:[-100,0,90]},
+      {id:'P02-FR',code:'P02',name:'Pata frontal derecha',size:[a.legW,b.legH,a.legD],pos:[x,b.legH/2,z],explode:[100,0,90]},
+      {id:'P02-BL',code:'P02',name:'Pata trasera izquierda',size:[a.legW,b.legH,a.legD],pos:[-x,b.legH/2,-z],explode:[-100,0,-90]},
+      {id:'P02-BR',code:'P02',name:'Pata trasera derecha',size:[a.legW,b.legH,a.legD],pos:[x,b.legH/2,-z],explode:[100,0,-90]},
+      {id:'T01-F',code:'T01',name:'Travesaño superior frontal',size:[b.long,70,30],pos:[0,a.H-a.top-35,z],explode:[0,40,80]},
+      {id:'T01-B',code:'T01',name:'Travesaño superior trasero',size:[b.long,70,30],pos:[0,a.H-a.top-35,-z],explode:[0,40,-80]},
+      {id:'T02-L',code:'T02',name:'Travesaño superior lateral izquierdo',size:[30,70,b.short],pos:[-x,a.H-a.top-35,0],explode:[-80,40,0]},
+      {id:'T02-R',code:'T02',name:'Travesaño superior lateral derecho',size:[30,70,b.short],pos:[x,a.H-a.top-35,0],explode:[80,40,0]},
+      {id:'A02-L',code:'A02',name:'Travesaño inferior lateral izquierdo',size:[a.foot,a.foot,b.short],pos:[-x,a.footY,0],explode:[-80,0,0]},
+      {id:'A02-R',code:'A02',name:'Travesaño inferior lateral derecho',size:[a.foot,a.foot,b.short],pos:[x,a.footY,0],explode:[80,0,0]},
+      {id:'A01',code:'A01',name:'Apoyapiés longitudinal',size:[b.long,a.foot,a.foot],pos:[0,a.footY,0],explode:[0,-40,0]}
+    ];
+  }
+
+  function cutList(){
+    const a=P(), b=DD(a);
+    return [
+      ['P01','Cubierta',1,`${a.L} × ${a.D} × ${a.top} mm`],
+      ['P02','Patas',4,`${a.legW.toFixed(1)} × ${a.legD.toFixed(1)} × ${b.legH} mm`],
+      ['T01','Travesaños sup. largos',2,`${b.long.toFixed(1)} × 30 × 70 mm`],
+      ['T02','Travesaños sup. laterales',2,`30 × ${b.short.toFixed(1)} × 70 mm`],
+      ['A01','Apoyapiés longitudinal',1,`${b.long.toFixed(1)} × ${a.foot.toFixed(1)} × ${a.foot.toFixed(1)} mm`],
+      ['A02','Travesaños inf. laterales',2,`${a.foot.toFixed(1)} × ${b.short.toFixed(1)} × ${a.foot.toFixed(1)} mm`]
+    ];
+  }
+
+  const scene=new THREE.Scene();
+  scene.background=new THREE.Color(0xf3f0ea);
+
+  const camera=new THREE.PerspectiveCamera(35,1,1,10000);
+  const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+  renderer.shadowMap.enabled=true;
+  renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  stage.appendChild(renderer.domElement);
+
+  const controls=new THREE.OrbitControls(camera,renderer.domElement);
+  controls.enableDamping=true;
+  controls.minDistance=700;
+  controls.maxDistance=7000;
+
+  scene.add(new THREE.HemisphereLight(0xffffff,0x766f67,2.0));
+  const dl=new THREE.DirectionalLight(0xffffff,3.2);
+  dl.position.set(1800,2600,1700);
+  dl.castShadow=true;
+  scene.add(dl);
+
+  const floor=new THREE.Mesh(
+    new THREE.PlaneGeometry(6500,5200),
+    new THREE.MeshStandardMaterial({color:0xded8cf,roughness:1})
+  );
+  floor.rotation.x=-Math.PI/2;
+  floor.receiveShadow=true;
+  scene.add(floor);
+
+  let group=new THREE.Group(); scene.add(group);
+  let selectedId=null, isolatedId=null, exploded=false;
+  let hiddenIds=new Set(), meshById=new Map();
+
+  function materialFor(id){
+    const sel=id===selectedId;
+    return new THREE.MeshStandardMaterial({
+      color: sel ? 0xf59e0b : 0x171717,
+      roughness:.72,
+      transparent:true,
+      opacity:selectedId && !sel ? .34 : 1,
+      emissive: sel ? 0x5a3100 : 0x000000,
+      emissiveIntensity: sel ? .42 : 0
+    });
+  }
+
+  function clearGroup(){
+    group.traverse(o=>{ if(o.geometry) o.geometry.dispose(); if(o.material) o.material.dispose(); });
+    scene.remove(group);
+    group=new THREE.Group();
+    scene.add(group);
+    meshById.clear();
+  }
+
+  function rebuild(doFit=true){
+    clearGroup();
+    partDefs().forEach(def=>{
+      const mesh=new THREE.Mesh(new THREE.BoxGeometry(def.size[0],def.size[1],def.size[2]), materialFor(def.id));
+      mesh.userData=def;
+      const e=exploded ? def.explode : [0,0,0];
+      mesh.position.set(def.pos[0]+e[0], def.pos[1]+e[1], def.pos[2]+e[2]);
+      mesh.castShadow=true; mesh.receiveShadow=true;
+      mesh.visible=!hiddenIds.has(def.id)&&(!isolatedId||isolatedId===def.id);
+      group.add(mesh);
+      meshById.set(def.id, mesh);
+    });
+    renderUI();
+    if(doFit) fitCamera();
+  }
+
+  function renderUI(){
+    const defs=partDefs(), a=P(), b=DD(a);
+    $('partsCount').textContent=defs.length;
+    $('partsList').innerHTML = defs.map(def=>`
+      <div class="part ${def.id===selectedId?'selected':''}" data-id="${def.id}">
+        <div class="part-top">
+          <div class="part-name">${def.name}</div>
+          <div class="part-code">${def.code}</div>
+        </div>
+        <div class="part-dim">${Math.round(def.size[0]*10)/10} × ${Math.round(def.size[2]*10)/10} × ${Math.round(def.size[1]*10)/10} mm</div>
+      </div>
+    `).join('');
+    document.querySelectorAll('.part').forEach(el=>el.onclick=()=>selectPart(el.dataset.id));
+
+    $('summary').innerHTML =
+      `<strong>Resumen geométrico</strong><br>`+
+      `Patas: 3×3" = ${a.legW.toFixed(1)} × ${a.legD.toFixed(1)} mm<br>`+
+      `Altura pata: ${b.legH} mm<br>`+
+      `Luz longitudinal: ${b.long.toFixed(1)} mm<br>`+
+      `Luz lateral: ${b.short.toFixed(1)} mm<br>`+
+      `Apoyapiés: 2×2" = ${a.foot.toFixed(1)} × ${a.foot.toFixed(1)} mm`;
+
+    const sel=defs.find(x=>x.id===selectedId);
+    $('status').textContent=sel?`Seleccionado: ${sel.name}`:'Modelo listo';
+    $('btnExplode').classList.toggle('active', exploded);
+  }
+
+  function selectPart(id){ selectedId=id; rebuild(false); }
+
+  function fitCamera(){
+    const box=new THREE.Box3().setFromObject(group);
+    if(box.isEmpty()) return;
+    const size=new THREE.Vector3(), center=new THREE.Vector3();
+    box.getSize(size); box.getCenter(center);
+    const maxDim=Math.max(size.x,size.y,size.z);
+    let dist=maxDim/(2*Math.tan(camera.fov*Math.PI/360));
+    dist*=1.72;
+    camera.position.set(center.x+dist*.86, center.y+dist*.62, center.z+dist*.86);
+    controls.target.copy(center);
+    controls.update();
+  }
+
+  function setView(v){
+    const box=new THREE.Box3().setFromObject(group), c=new THREE.Vector3(), s=new THREE.Vector3();
+    box.getCenter(c); box.getSize(s);
+    const dist=Math.max(s.x,s.y,s.z)*1.85;
+    if(v==='iso') camera.position.set(c.x+dist*.78,c.y+dist*.58,c.z+dist*.78);
+    if(v==='front') camera.position.set(c.x,c.y,c.z+dist);
+    if(v==='back') camera.position.set(c.x,c.y,c.z-dist);
+    if(v==='left') camera.position.set(c.x-dist,c.y,c.z);
+    if(v==='right') camera.position.set(c.x+dist,c.y,c.z);
+    if(v==='top') camera.position.set(c.x,c.y+dist,c.z+.01);
+    controls.target.copy(c);
+    controls.update();
+  }
+
+  function openModal(title,body){ modalTitle.textContent=title; modalBody.innerHTML=body; modal.classList.add('open'); }
+  function closeModal(){ modal.classList.remove('open'); }
+
+  function detailsModal(){
+    const a=P(), b=DD(a);
+    openModal('Detalles del proyecto', `
+      <div class="modal-grid">
+        <div class="card"><strong>Dimensión general</strong><br>${a.L} × ${a.D} × ${a.H} mm</div>
+        <div class="card"><strong>Patas</strong><br>3×3" = ${a.legW.toFixed(1)} × ${a.legD.toFixed(1)} × ${b.legH} mm</div>
+        <div class="card"><strong>Travesaños largos</strong><br>${b.long.toFixed(1)} mm entre patas</div>
+        <div class="card"><strong>Travesaños laterales</strong><br>${b.short.toFixed(1)} mm entre patas</div>
+        <div class="card"><strong>Cubierta</strong><br>${a.top} mm espesor</div>
+        <div class="card"><strong>Apoyapiés</strong><br>2×2" = ${a.foot.toFixed(1)} × ${a.foot.toFixed(1)} mm · centro a ${a.footY} mm</div>
+      </div>
+    `);
+  }
+
+  function cutModal(){
+    openModal('Despiece', `
+      <table class="table">
+        <thead><tr><th>Código</th><th>Pieza</th><th>Cant.</th><th>Medida</th></tr></thead>
+        <tbody>${cutList().map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td>${x[2]}</td>${x[3]}</tr>`).join('');
+      </table>
+    `);
+  }
+
+  function partModal(){
+    const def=partDefs().find(x=>x.id===selectedId);
+    if(!def){
+      openModal('Pieza','<div class="card">Selecciona primero una pieza del listado o con doble clic sobre el modelo.</div>');
+      return;
+    }
+    openModal(def.name, `
+      <div class="modal-grid">
+        <div class="card"><strong>Código</strong><br>${def.code}</div>
+        <div class="card"><strong>ID</strong><br>${def.id}</div>
+        <div class="card"><strong>Dimensión X</strong><br>${def.size[0].toFixed(1)} mm</div>
+        <div class="card"><strong>Dimensión Y</strong><br>${def.size[1].toFixed(1)} mm</div>
+        <div class="card"><strong>Dimensión Z</strong><br>${def.size[2].toFixed(1)} mm</div>
+        <div class="card"><strong>Centro XYZ</strong><br>${def.pos.map(v=>Math.round(v*10)/10).join(' / ')} mm</div>
+      </div>
+    `);
+  }
+
+  function download(name,mime,text){
+    const blob=new Blob([text],{type:mime});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
+
+  function preparePrintReport(){
+    const a=P(), b=DD(a);
+
+    const oldPos=camera.position.clone();
+    const oldTarget=controls.target.clone();
+
+    const box=new THREE.Box3().setFromObject(group);
+    const c=new THREE.Vector3(), s=new THREE.Vector3();
+    box.getCenter(c); box.getSize(s);
+    const dist=Math.max(s.x,s.y,s.z)*1.85;
+
+    camera.position.set(c.x+dist*.78,c.y+dist*.58,c.z+dist*.78);
+    controls.target.copy(c);
+    controls.update();
+    renderer.render(scene,camera);
+    $('prImage').src=renderer.domElement.toDataURL('image/png');
+
+    camera.position.copy(oldPos);
+    controls.target.copy(oldTarget);
+    controls.update();
+    renderer.render(scene,camera);
+
+    $('prSubtitle').textContent=`${a.L} × ${a.D} × ${a.H} mm · patas 3×3" · cubierta ${a.top} mm`;
+    $('prL').textContent=`${a.L} mm`;
+    $('prD').textContent=`${a.D} mm`;
+    $('prH').textContent=`${a.H} mm`;
+    $('prLeg').textContent=`${a.legW.toFixed(1)} × ${a.legD.toFixed(1)} mm`;
+    $('prCutList').innerHTML=cutList().map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td><td>${x[2]}</td>${x[3]}</tr>`).join('');
+    $('prGeometry').innerHTML=
+      `Altura pata: <strong>${b.legH}</strong><br>`+
+      `Luz longitudinal: <strong>${b.long.toFixed(1)}</strong><br>`+
+      `Luz lateral: <strong>${b.short.toFixed(1)}</strong><br>`+
+      `Altura apoyapiés: <strong>${a.footY}</strong>`;
+    $('prConfig').innerHTML=
+      `Patas: <strong>3×3" = ${a.legW.toFixed(1)} × ${a.legD.toFixed(1)} mm</strong><br>`+
+      `Apoyapiés: <strong>2×2" = ${a.foot.toFixed(1)} × ${a.foot.toFixed(1)} mm</strong><br>`+
+      `Cubierta: <strong>${a.top}</strong> de espesor<br>`+
+      `Escuadras sugeridas: <strong>4</strong>`;
+  }
+
+  function exportModal(){
+    openModal('Exportar', `
+      <div class="export-grid">
+        <button id="expCsv">Despiece CSV</button>
+        <button id="expJson">Proyecto JSON</button>
+        <button id="expPrint">Imprimir / PDF</button>
+        <button id="expClose">Cerrar</button>
+      </div>
+    `);
+    $('expCsv ).onclick=()=>{
+      const rows=[['Codigo','Pieza','Cantidad','Medida'],...cutList()];
+      download('despiece_isla.csv','text/csv;charset=utf-8',rows.map(r=>r.join(';')).join('\n'));
+    };
+    $('expJson').onclick=()=>{
+      download('proyecto_isla.json','application/json;charset=utf-8',
+        JSON.stringify({project:'Isla comedor',parameters:P(),parts:partDefs(),cutList:cutList()},null,2)
+      );
+    };
+    $('expPrint').onclick=()=>{ preparePrintReport(); setTimeout(()=>window.print(),80); };
+    $('expClose').onclick=closeModal;
+  }
+
+  const raycaster=new THREE.Raycaster(), mouse=new THREE.Vector2();
+  renderer.domElement.addEventListener('dblclick',e=>{
+    const r=renderer.domElement.getBoundingClientRect();
+    mouse.x=((e.clientX-r.left)/r.width)*2-1;
+    mouse.y=-((e.clientY-r.top)/r.height)*2+1;
+    raycaster.setFromCamera(mouse,camera);
+    const hit=raycaster.intersectObjects([...meshById.values()].filter(x=>x.visible),false)[0];
+    if(hit && hit.object && hit.object.userData) selectPart(hit.object.userData.id);
+  });
+
+  $('btnExplode').onclick=()=>{ exploded=!exploded; rebuild(false); };
+  $('btnFit').onclick=fitCamera;
+  $('btnClearSel').onclick=()=>{ selectedId=null; rebuild(false); };
+  $('btnIsolate').onclick=()=>{ if(selectedId){ isolatedId=selectedId; rebuild(false); } };
+  $('btnHide').onclick=()=>{ if(selectedId){ hiddenIds.add(selectedId); selectedId=null; rebuild(false); } };
+  $('btnShowAll').onclick=()=>{ isolatedId=null; hiddenIds.clear(); rebuild(false); };
+  $('btnPartModal').onclick=partModal;
+  $('btnDetalles').onclick=detailsModal;
+  $('btnDespiece').onclick=cutModal;
+  $('btnExportar').onclick=exportModal;
+  $('modalClose').onclick=closeModal;
+  modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
+  window.addEventListener('beforeprint',preparePrintReport);
+
+  document.querySelectorAll('[data-view]').forEach(b=>{
+    b.onclick=()=>{
+      document.querySelectorAll('[data-view]').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      setView(b.dataset.view);
+    };
+  });
+
+  function resize(){
+    const r=stage.getBoundingClientRect(), w=Math.max(320,r.width), h=Math.max(320,r.height);
+    renderer.setSize(w,h,false);
+    camera.aspect=w/h;
+    camera.updateProjectionMatrix();
+  }
+  new ResizeObserver(resize).observe(stage);
+
+  resize();
+  rebuild();
+
+  (function loop(){
+    controls.update();
+    renderer.render(scene,camera);
+    requestAnimationFrame(loop);
+  })();
+})();
+</script>
+</body>
+</html>
