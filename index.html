@@ -336,7 +336,8 @@ footer{
     });
     [-b.long/4,0,b.long/4].forEach((px,i)=>defs.push({id:`T03-${i+1}`,code:'T03',name:`Apoyo interior ${i+1}`,size:[a.railW,a.railH,b.short],pos:[px,railY,0],explode:[0,80,(i-1)*60]}));
     [-1,1].forEach((sign,i)=>defs.push({id:`A01-${i+1}`,code:'A01',name:`Apoyapiés · pieza ${i+1} de 2`,size:[b.footLong,a.foot,25.4],pos:[0,a.footY,sign*12.7],explode:[0,-40,sign*30]}));
-    return defs;
+    const sections={P01:'1×6″','P01-R':'1×6″ de origen · recortada a 90,4 mm de ancho',P02:'2×4″',T01:'2×3″',T02:'2×3″',T03:'2×3″',A02:'2×3″',A01:'1×2″ · dos piezas forman 2×2″'};
+    return defs.map(def=>({...def,sectionInches:sections[def.code]}));
   }
 
   function cutList(){
@@ -432,6 +433,7 @@ footer{
           <div class="part-name">${def.name}</div>
           <div class="part-code">${def.code}</div>
         </div>
+        <div class="part-dim"><strong>${def.sectionInches}</strong></div>
         <div class="part-dim">${Math.round(def.size[0]*10)/10} × ${Math.round(def.size[2]*10)/10} × ${Math.round(def.size[1]*10)/10} mm</div>
       </div>
     `).join('');
@@ -515,6 +517,7 @@ footer{
       <div class="modal-grid">
         <div class="card"><strong>Código</strong><br>${def.code}</div>
         <div class="card"><strong>ID</strong><br>${def.id}</div>
+        <div class="card"><strong>Sección nominal en pulgadas</strong><br>${def.sectionInches}</div>
         <div class="card"><strong>Dimensión X</strong><br>${def.size[0].toFixed(1)} mm</div>
         <div class="card"><strong>Dimensión Y</strong><br>${def.size[1].toFixed(1)} mm</div>
         <div class="card"><strong>Dimensión Z</strong><br>${def.size[2].toFixed(1)} mm</div>
