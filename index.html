@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Isla comedor · visor fijo v12</title>
+<title>Isla comedor · dos versiones</title>
 <style>
 :root{
   --bg:#efede9;
@@ -46,7 +46,8 @@ header{
   padding:0 10px;border-bottom:1px solid var(--line);background:var(--panel2);
   font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em
 }
-.left-body{padding:9px 10px;display:grid;gap:7px}
+.left-body{padding:9px 10px;display:grid;gap:7px;overflow:auto}
+#modelVariant{width:100%;padding:8px;border:1px solid var(--line);border-radius:8px;background:white;font:inherit;font-size:12px}
 .info-box{
   border:1px solid var(--line);background:var(--panel2);border-radius:9px;padding:8px;font-size:11px;color:var(--muted);line-height:1.45
 }
@@ -162,7 +163,7 @@ footer{
   <header>
     <div class="brand">
       <h1>Isla comedor</h1>
-      <div class="meta">1500 × 700 × 900 mm · patas 2×4" · cubierta 25,4 mm</div>
+      <div id="modelMeta" class="meta">1500 × 700 × 900 mm · patas 2×4" · cubierta 25,4 mm</div>
     </div>
     <div class="header-actions">
       <button id="btnDespiece">Despiece</button>
@@ -173,18 +174,23 @@ footer{
 
   <main class="main">
     <aside class="side">
-      <div class="side-head"><span>Especificación</span><span>fija</span></div>
+      <div class="side-head"><span>Especificación</span><span>versiones</span></div>
       <div class="left-body">
+        <label for="modelVariant" style="font-size:12px;font-weight:700">Versión del mueble</label>
+        <select id="modelVariant">
+          <option value="boards">Patas 2×4″ · tablas de 1″</option>
+          <option value="panel">Patas 3×3″ · tablero de 30 mm</option>
+        </select>
         <div class="info-box"><strong>Medidas generales</strong><br>
           Largo: 1500 mm<br>
           Profundidad: 700 mm<br>
           Altura total: 900 mm
         </div>
-        <div class="info-box"><strong>Patas</strong><br>
+        <div id="legSpec" class="info-box"><strong>Patas</strong><br>
           2×4" = 101,6 × 50,8 mm<br>
           Altura: 874,6 mm
         </div>
-        <div class="info-box"><strong>Cubierta</strong><br>
+        <div id="topSpec" class="info-box"><strong>Cubierta</strong><br>
           1500 × 700 × 25,4 mm<br>4 tablas de 152,4 mm + 1 de 90,4 mm
         </div>
         <div class="info-box"><strong>Apoyapiés</strong><br>
@@ -316,16 +322,19 @@ footer{
     return;
   }
 
+  let modelVariant="boards";
   function P(){
-    return {L:1500,D:700,H:900,frameL:1400,frameD:600,legW:101.6,legD:50.8,top:25.4,railW:50.8,railH:76.2,foot:50.8,footTop:200,footY:174.6};
+    const base={L:1500,D:700,H:900,frameL:1400,frameD:600,legW:101.6,legD:50.8,top:25.4,railW:50.8,railH:76.2,foot:50.8,footTop:200,footY:174.6};
+    return {...base,...(modelVariant==='panel'?{legW:76.2,legD:76.2,top:30}:{}),legSection:modelVariant==='panel'?'3×3″':'2×4″',panel:modelVariant==='panel'};
   }
-  function DD(a){ return {legH:a.H-a.top,long:a.frameL-2*a.legW,short:a.frameD-2*a.legD,footLong:a.frameL-a.legW-a.railW}; }
+  function DD(a){ return {legH:a.H-a.top,long:a.frameL-2*a.legW,short:a.frameD-2*a.legD,supportShort:a.frameD-a.legD-a.railW,footLong:a.frameL-a.legW-a.railW}; }
 
   function partDefs(){
     const a=P(),b=DD(a),x=a.frameL/2-a.legW/2,z=a.frameD/2-a.legD/2;
     const railY=b.legH-a.railH/2,defs=[];
     let edge=-a.D/2;
-    [152.4,152.4,152.4,152.4,90.4].forEach((width,i)=>{
+    if(a.panel) defs.push({id:'P01-panel',code:'P01',name:'Tablero de cubierta',size:[a.L,a.top,a.D],pos:[0,a.H-a.top/2,0],explode:[0,180,0]});
+    else [152.4,152.4,152.4,152.4,90.4].forEach((width,i)=>{
       defs.push({id:`P01-${i+1}`,code:i===4?'P01-R':'P01',name:`Tabla cubierta ${i+1}${i===4?' (recortada)':''}`,size:[a.L,a.top,width],pos:[0,a.H-a.top/2,edge+width/2],explode:[0,180,(i-2)*45]});edge+=width;
     });
     [['FL',-x,z,'frontal izquierda'],['FR',x,z,'frontal derecha'],['BL',-x,-z,'trasera izquierda'],['BR',x,-z,'trasera derecha']].forEach(([id,px,pz,name])=>defs.push({id:`P02-${id}`,code:'P02',name:`Pata ${name}`,size:[a.legW,b.legH,a.legD],pos:[px,b.legH/2,pz],explode:[Math.sign(px)*100,0,Math.sign(pz)*90]}));
@@ -334,21 +343,22 @@ footer{
       defs.push({id:`T02-${sign}`,code:'T02',name:`Lateral superior ${sign===1?'derecho':'izquierdo'}`,size:[a.railW,a.railH,b.short],pos:[sign*(a.frameL/2-a.railW/2),railY,0],explode:[sign*80,40,0]});
       defs.push({id:`A02-${sign}`,code:'A02',name:`Lateral inferior ${sign===1?'derecho':'izquierdo'}`,size:[a.railW,a.railH,b.short],pos:[sign*x,a.footTop-a.railH/2,0],explode:[sign*80,0,0]});
     });
-    [-b.long/4,0,b.long/4].forEach((px,i)=>defs.push({id:`T03-${i+1}`,code:'T03',name:`Apoyo interior ${i+1}`,size:[a.railW,a.railH,b.short],pos:[px,railY,0],explode:[0,80,(i-1)*60]}));
+    [-b.long/4,0,b.long/4].forEach((px,i)=>defs.push({id:`T03-${i+1}`,code:'T03',name:`Apoyo interior ${i+1}`,size:[a.railW,a.railH,b.supportShort],pos:[px,railY,0],explode:[0,80,(i-1)*60]}));
     [-1,1].forEach((sign,i)=>defs.push({id:`A01-${i+1}`,code:'A01',name:`Apoyapiés · pieza ${i+1} de 2`,size:[b.footLong,a.foot,25.4],pos:[0,a.footY,sign*12.7],explode:[0,-40,sign*30]}));
-    const sections={P01:'1×6″','P01-R':'1×6″ de origen · recortada a 90,4 mm de ancho',P02:'2×4″',T01:'2×3″',T02:'2×3″',T03:'2×3″',A02:'2×3″',A01:'1×2″ · dos piezas forman 2×2″'};
+    const sections={P01:a.panel?'30 mm de espesor (≈1,18″)':'1×6″','P01-R':'1×6″ de origen · recortada a 90,4 mm de ancho',P02:a.legSection,T01:'2×3″',T02:'2×3″',T03:'2×3″',A02:'2×3″',A01:'1×2″ · dos piezas forman 2×2″'};
     return defs.map(def=>({...def,sectionInches:sections[def.code]}));
   }
 
   function cutList(){
     const a=P(), b=DD(a),f=n=>n.toFixed(1);
     return [
+      ...(a.panel ? [['P01','Tablero de 30 mm',1,`${a.L} × ${a.D} × ${a.top} mm`]] : [
       ['P01','Tablas cubierta 1×6"',4,`${a.L} × 152.4 × ${a.top} mm`],
-      ['P01-R','Tabla cubierta recortada de 1×6"',1,`${a.L} × 90.4 × ${a.top} mm`],
-      ['P02','Patas 2×4"',4,`${f(b.legH)} × ${f(a.legW)} × ${f(a.legD)} mm`],
+      ['P01-R','Tabla cubierta recortada de 1×6"',1,`${a.L} × 90.4 × ${a.top} mm`]]),
+      ['P02',`Patas ${a.legSection}`,4,`${f(b.legH)} × ${f(a.legW)} × ${f(a.legD)} mm`],
       ['T01','Largueros superiores 2×3"',2,`${f(b.long)} × ${f(a.railW)} × ${f(a.railH)} mm`],
       ['T02','Laterales superiores 2×3"',2,`${f(b.short)} × ${f(a.railW)} × ${f(a.railH)} mm`],
-      ['T03','Apoyos interiores 2×3"',3,`${f(b.short)} × ${f(a.railW)} × ${f(a.railH)} mm`],
+      ['T03','Apoyos interiores 2×3"',3,`${f(b.supportShort)} × ${f(a.railW)} × ${f(a.railH)} mm`],
       ['A02','Laterales inferiores 2×3"',2,`${f(b.short)} × ${f(a.railW)} × ${f(a.railH)} mm`],
       ['A01','Piezas 1×2" para unir como apoyapiés',2,`${f(b.footLong)} × 25.4 × ${f(a.foot)} mm`]
     ];
@@ -426,6 +436,9 @@ footer{
 
   function renderUI(){
     const defs=partDefs(), a=P(), b=DD(a);
+    $('modelMeta').textContent=`1500 × 700 × 900 mm · patas ${a.legSection} · cubierta ${a.top} mm`;
+    $('legSpec').innerHTML=`<strong>Patas</strong><br>${a.legSection} = ${a.legW} × ${a.legD} mm<br>Altura: ${b.legH} mm`;
+    $('topSpec').innerHTML=`<strong>Cubierta</strong><br>${a.L} × ${a.D} × ${a.top} mm<br>${a.panel?'Tablero único de 30 mm':'4 tablas de 152,4 mm + 1 de 90,4 mm'}`;
     $('partsCount').textContent=defs.length;
     $('partsList').innerHTML = defs.map(def=>`
       <div class="part ${def.id===selectedId?'selected':''}" data-id="${def.id}">
@@ -441,7 +454,7 @@ footer{
 
     $('summary').innerHTML =
       `<strong>Resumen geométrico</strong><br>`+
-      `Patas: 2×4" = ${a.legW.toFixed(1)} × ${a.legD.toFixed(1)} mm<br>`+
+      `Patas: ${a.legSection} = ${a.legW.toFixed(1)} × ${a.legD.toFixed(1)} mm<br>`+
       `Altura pata: ${b.legH} mm<br>`+
       `Luz longitudinal: ${b.long.toFixed(1)} mm<br>`+
       `Luz lateral: ${b.short.toFixed(1)} mm<br>`+
@@ -489,7 +502,7 @@ footer{
     openModal('Detalles del proyecto', `
       <div class="modal-grid">
         <div class="card"><strong>Dimensión general</strong><br>${a.L} × ${a.D} × ${a.H} mm</div>
-        <div class="card"><strong>Patas</strong><br>2×4" = ${a.legW.toFixed(1)} × ${a.legD.toFixed(1)} × ${b.legH} mm</div>
+        <div class="card"><strong>Patas</strong><br>${a.legSection} = ${a.legW.toFixed(1)} × ${a.legD.toFixed(1)} × ${b.legH} mm</div>
         <div class="card"><strong>Travesaños largos</strong><br>${b.long.toFixed(1)} mm entre patas</div>
         <div class="card"><strong>Travesaños laterales</strong><br>${b.short.toFixed(1)} mm entre patas</div>
         <div class="card"><strong>Cubierta</strong><br>${a.top} mm espesor</div>
@@ -556,7 +569,7 @@ footer{
     controls.update();
     renderer.render(scene,camera);
 
-    $('prSubtitle').textContent=`${a.L} × ${a.D} × ${a.H} mm · patas 2×4" · cubierta ${a.top} mm`;
+    $('prSubtitle').textContent=`${a.L} × ${a.D} × ${a.H} mm · patas ${a.legSection} · cubierta ${a.top} mm`;
     $('prL').textContent=`${a.L} mm`;
     $('prD').textContent=`${a.D} mm`;
     $('prH').textContent=`${a.H} mm`;
@@ -568,9 +581,9 @@ footer{
       `Luz lateral: <strong>${b.short.toFixed(1)}</strong><br>`+
       `Cara superior apoyapiés: <strong>${a.footTop}</strong>`;
     $('prConfig').innerHTML=
-      `Patas: <strong>2×4" = ${a.legW.toFixed(1)} × ${a.legD.toFixed(1)} mm</strong><br>`+
+      `Patas: <strong>${a.legSection} = ${a.legW.toFixed(1)} × ${a.legD.toFixed(1)} mm</strong><br>`+
       `Apoyapiés: <strong>Doble 1×2" = ${a.foot.toFixed(1)} × ${a.foot.toFixed(1)} mm</strong><br>`+
-      `Cubierta: <strong>${a.top}</strong> de espesor · 5 tablas<br>`+
+      `Cubierta: <strong>${a.top}</strong> mm de espesor · ${a.panel?"tablero único":"5 tablas"}<br>`+
       `Marco exterior: <strong>${a.frameL} × ${a.frameD}</strong><br>`+
       `Escuadras sugeridas: <strong>4</strong>`;
   }
@@ -586,11 +599,11 @@ footer{
     `);
     $('expCsv').onclick=()=>{
       const rows=[['Codigo','Pieza','Cantidad','Medida'],...cutList()];
-      download('despiece_isla.csv','text/csv;charset=utf-8',rows.map(r=>r.join(';')).join('\n'));
+      download(`despiece_isla_${modelVariant}.csv`,'text/csv;charset=utf-8',rows.map(r=>r.join(';')).join('\n'));
     };
     $('expJson').onclick=()=>{
-      download('proyecto_isla.json','application/json;charset=utf-8',
-        JSON.stringify({project:'Isla comedor',parameters:P(),parts:partDefs(),cutList:cutList()},null,2)
+      download(`proyecto_isla_${modelVariant}.json`,'application/json;charset=utf-8',
+        JSON.stringify({project:'Isla comedor',variant:modelVariant,parameters:P(),parts:partDefs(),cutList:cutList()},null,2)
       );
     };
     $('expPrint').onclick=()=>{ preparePrintReport(); setTimeout(()=>window.print(),80); };
@@ -607,6 +620,11 @@ footer{
     if(hit && hit.object && hit.object.userData) selectPart(hit.object.userData.id);
   });
 
+  $('modelVariant').onchange=()=>{
+    modelVariant=$('modelVariant').value;
+    selectedId=null; isolatedId=null; hiddenIds.clear(); closeModal();
+    rebuild(false);
+  };
   $('btnExplode').onclick=()=>{ exploded=!exploded; rebuild(false); };
   $('btnFit').onclick=fitCamera;
   $('btnClearSel').onclick=()=>{ selectedId=null; rebuild(false); };
@@ -649,4 +667,5 @@ footer{
 </script>
 </body>
 </html>
+
 
