@@ -192,7 +192,7 @@ footer{
           Cara superior a 200 mm del piso
         </div>
         <div class="info-box"><strong>Travesaños superiores</strong><br>
-          2×3": 76,2 × 50,8 mm<br>Marco 1400 × 600 mm + 3 apoyos interiores
+          2×3": 76,2 × 50,8 mm<br>Marco 1400 × 600 mm + 1 travesaño central
         </div>
         <div class="info-box"><strong>Refuerzo sugerido</strong><br>
           Escuadras interiores bajo la cubierta<br>
@@ -339,7 +339,7 @@ footer{
       defs.push({id:`T02-${sign}`,code:'T02',name:`Lateral superior ${sign===1?'derecho':'izquierdo'}`,size:[a.railW,a.railH,b.short],pos:[sign*(a.frameL/2-a.railW/2),railY,0],explode:[sign*80,40,0]});
       defs.push({id:`A02-${sign}`,code:'A02',name:`Lateral inferior ${sign===1?'derecho':'izquierdo'}`,size:[a.railW,a.railH,b.short],pos:[sign*x,a.footTop-a.railH/2,0],explode:[sign*80,0,0]});
     });
-    [-b.long/4,0,b.long/4].forEach((px,i)=>defs.push({id:`T03-${i+1}`,code:'T03',name:`Apoyo interior ${i+1}`,size:[a.railW,a.railH,b.supportShort],pos:[px,railY,0],explode:[0,80,(i-1)*60]}));
+    defs.push({id:'T03',code:'T03',name:'Travesaño central superior',size:[a.railW,a.railH,b.supportShort],pos:[0,railY,0],explode:[0,80,0]});
     defs.push({id:'A01',code:'A01',name:'Apoyapiés longitudinal',size:[b.footLong,a.foot,a.foot],pos:[0,a.footY,0],explode:[0,-40,0]});
     const sections={P01:'Finger joint · 30 mm',P02:a.legSection,T01:'2×3″',T02:'2×3″',T03:'2×3″',A02:'2×3″',A01:'2×2″'};
     return defs.map(def=>({...def,sectionInches:sections[def.code]}));
@@ -352,7 +352,7 @@ footer{
       ['P02',`Patas ${a.legSection}`,4,`${f(b.legH)} × ${f(a.legW)} × ${f(a.legD)} mm`],
       ['T01','Largueros superiores 2×3"',2,`${f(b.long)} × ${f(a.railW)} × ${f(a.railH)} mm`],
       ['T02','Laterales superiores 2×3"',2,`${f(b.short)} × ${f(a.railW)} × ${f(a.railH)} mm`],
-      ['T03','Apoyos interiores 2×3"',3,`${f(b.supportShort)} × ${f(a.railW)} × ${f(a.railH)} mm`],
+      ['T03','Travesaño central superior 2×3"',1,`${f(b.supportShort)} × ${f(a.railW)} × ${f(a.railH)} mm`],
       ['A02','Laterales inferiores 2×3"',2,`${f(b.short)} × ${f(a.railW)} × ${f(a.railH)} mm`],
       ['A01','Apoyapiés longitudinal 2×2"',1,`${f(b.footLong)} × ${f(a.foot)} × ${f(a.foot)} mm`]
     ];
