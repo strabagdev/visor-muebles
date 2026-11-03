@@ -3,157 +3,79 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Isla comedor · visor fijo</title>
+<title>Visor Muebles · dos versiones</title>
 <style>
 :root{
-  --bg:#efede9;
-  --panel:#ffffff;
-  --panel2:#f8f7f4;
-  --line:#d8d3cb;
-  --text:#1f1f1f;
-  --muted:#6d685f;
-  --sel:#f59e0b;
+  --bg:#efede9; --panel:#fff; --panel2:#f8f7f4; --line:#d8d3cb; --text:#1f1f1f; --muted:#6d685f; --sel:#f59e0b;
 }
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+button,select{font:inherit}
 button{appearance:none;border:1px solid var(--line);background:#fff;color:#161616;border-radius:8px;padding:8px 10px;font-size:13px;font-weight:650;cursor:pointer;white-space:nowrap}
 button:hover{background:#f3f0eb}
 button.active{background:#181818;color:#fff;border-color:#181818}
-
+select{width:100%;padding:8px;border:1px solid var(--line);border-radius:8px;background:#fff;color:#111;font-size:12px}
 #app{width:100%;height:100%;display:grid;grid-template-rows:54px minmax(0,1fr) 34px}
-header{
-  display:flex;align-items:center;justify-content:space-between;gap:12px;
-  padding:8px 12px;border-bottom:1px solid var(--line);background:#f7f5f1;
-}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;border-bottom:1px solid var(--line);background:#f7f5f1}
 .brand{display:flex;align-items:center;gap:10px;min-width:0}
-.brand h1{margin:0;font-size:18px;line-height:1}
-.brand .meta{font-size:12px;color:var(--muted)}
-.header-actions{display:flex;align-items:center;gap:6px}
-
-.main{
-  min-height:0;
-  display:grid;
-  grid-template-columns:230px minmax(0,1fr) 260px;
-  gap:8px;
-  padding:8px;
-}
-.side,.center{
-  min-height:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden
-}
+.brand h1{margin:0;font-size:18px;line-height:1;white-space:nowrap}
+.brand .meta{font-size:12px;color:var(--muted);white-space:nowrap}
+.header-actions{display:flex;align-items:center;gap:6px;flex-wrap:nowrap}
+.main{min-height:0;display:grid;grid-template-columns:260px minmax(0,1fr) 280px;gap:8px;padding:8px}
+.side,.center{min-height:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .side{display:flex;flex-direction:column}
-.side-head{
-  height:38px;display:flex;align-items:center;justify-content:space-between;
-  padding:0 10px;border-bottom:1px solid var(--line);background:var(--panel2);
-  font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em
-}
+.side-head{height:38px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;border-bottom:1px solid var(--line);background:var(--panel2);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
 .left-body{padding:9px 10px;display:grid;gap:7px;overflow:auto}
-.info-box{
-  border:1px solid var(--line);background:var(--panel2);border-radius:9px;padding:8px;font-size:11px;color:var(--muted);line-height:1.45
-}
-.quick{
-  display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:3px
-}
+.info-box{border:1px solid var(--line);background:var(--panel2);border-radius:9px;padding:8px;font-size:11px;color:var(--muted);line-height:1.45}
+.quick{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:3px}
 .center{display:grid;grid-template-rows:40px minmax(0,1fr)}
-.viewer-toolbar{
-  display:flex;align-items:center;justify-content:space-between;gap:8px;
-  padding:5px 7px;border-bottom:1px solid var(--line);background:var(--panel2)
-}
-.viewer-toolbar .left,.viewer-toolbar .right{display:flex;gap:5px;align-items:center}
+.viewer-toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 7px;border-bottom:1px solid var(--line);background:var(--panel2)}
+.viewer-toolbar .left,.viewer-toolbar .right{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
 .viewer-toolbar button{padding:6px 8px;font-size:12px}
 #stage{min-height:0;position:relative}
 #stage canvas{display:block;width:100%;height:100%}
-.hud{
-  position:absolute;left:10px;bottom:10px;display:flex;gap:6px;pointer-events:none
-}
-.hud-chip{
-  background:rgba(255,255,255,.92);border:1px solid rgba(180,180,180,.6);border-radius:8px;
-  padding:5px 7px;font-size:11px;color:#555;backdrop-filter:blur(6px)
-}
-.parts{
-  padding:7px;display:grid;gap:5px;align-content:start;overflow:auto
-}
-.part{
-  border:1px solid var(--line);border-radius:8px;padding:7px 8px;background:#fff;cursor:pointer
-}
+.hud{position:absolute;left:10px;bottom:10px;display:flex;gap:6px;pointer-events:none}
+.hud-chip{background:rgba(255,255,255,.92);border:1px solid rgba(180,180,180,.6);border-radius:8px;padding:5px 7px;font-size:11px;color:#555;backdrop-filter:blur(6px)}
+.parts{padding:7px;display:grid;gap:5px;align-content:start;overflow:auto}
+.part{border:1px solid var(--line);border-radius:8px;padding:7px 8px;background:#fff;cursor:pointer}
 .part:hover{background:#f7f5f1}
 .part.selected{border-color:var(--sel);box-shadow:0 0 0 2px rgba(245,158,11,.16)}
 .part-top{display:flex;justify-content:space-between;gap:6px;align-items:center}
 .part-code{font-size:10px;color:var(--muted);font-weight:800}
 .part-name{font-size:12px;font-weight:750}
 .part-dim{font-size:10px;color:var(--muted);margin-top:2px}
-.part-actions{
-  margin-top:auto;padding:7px;border-top:1px solid var(--line);
-  display:grid;grid-template-columns:1fr 1fr;gap:5px;background:var(--panel2)
-}
+.part-actions{margin-top:auto;padding:7px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:5px;background:var(--panel2)}
 .part-actions button{padding:7px;font-size:11px}
-footer{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  padding:0 12px;border-top:1px solid var(--line);background:#f7f5f1;font-size:11px;color:var(--muted)
-}
-
-/* Modal */
-.modal{
-  position:fixed;inset:0;background:rgba(0,0,0,.34);display:none;align-items:center;justify-content:center;padding:24px;z-index:20
-}
+footer{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px;border-top:1px solid var(--line);background:#f7f5f1;font-size:11px;color:var(--muted)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.34);display:none;align-items:center;justify-content:center;padding:24px;z-index:20}
 .modal.open{display:flex}
-.modal-card{
-  width:min(760px,92vw);max-height:82vh;overflow:auto;background:#fff;border-radius:14px;border:1px solid var(--line);
-  box-shadow:0 20px 60px rgba(0,0,0,.25)
-}
-.modal-head{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line)
-}
+.modal-card{width:min(780px,92vw);max-height:82vh;overflow:auto;background:#fff;border-radius:14px;border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line)}
 .modal-head h2{margin:0;font-size:17px}
 .modal-body{padding:14px}
 .modal-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .card{border:1px solid var(--line);border-radius:9px;padding:9px;background:#faf9f7;font-size:12px}
-.table{width:100%;border-collapse:collapse;font-size:12px}
-.table th,.table td{text-align:left;padding:7px;border-bottom:1px solid var(--line)}
+.table{width:100%;border-collapse:collapse;font-size:12px}.table th,.table td{text-align:left;padding:7px;border-bottom:1px solid var(--line)}
 .export-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .export-grid button{padding:12px}
-
 #printReport{display:none}
-
 @media print{
   @page{size:A4 portrait;margin:10mm}
   html,body{width:auto;height:auto;overflow:visible!important;background:#fff!important;color:#111!important}
   #app,.modal{display:none!important}
   #printReport{display:block!important;width:100%;font-family:Arial,Helvetica,sans-serif;color:#111}
-  .pr-header{
-    display:flex;justify-content:space-between;align-items:flex-end;gap:12px;
-    border-bottom:2px solid #111;padding-bottom:5mm;margin-bottom:5mm;
-  }
-  .pr-title{font-size:20pt;font-weight:700;line-height:1.1}
-  .pr-sub{font-size:9pt;color:#555;margin-top:2mm}
-  .pr-id{font-size:8.5pt;color:#555;text-align:right}
-  .pr-figure{
-    width:100%;height:108mm;display:flex;align-items:center;justify-content:center;
-    border:0.3mm solid #bbb;background:#fafafa;margin-bottom:5mm;overflow:hidden;
-  }
+  .pr-header{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;border-bottom:2px solid #111;padding-bottom:5mm;margin-bottom:5mm}
+  .pr-title{font-size:20pt;font-weight:700;line-height:1.1}.pr-sub{font-size:9pt;color:#555;margin-top:2mm}.pr-id{font-size:8.5pt;color:#555;text-align:right}
+  .pr-figure{width:100%;height:108mm;display:flex;align-items:center;justify-content:center;border:0.3mm solid #bbb;background:#fafafa;margin-bottom:5mm;overflow:hidden}
   .pr-figure img{max-width:100%;max-height:100%;object-fit:contain;display:block}
-  .pr-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:3mm;margin-bottom:5mm}
-  .pr-kpi{border:0.25mm solid #bbb;padding:2.5mm;min-height:16mm}
-  .pr-kpi strong{display:block;font-size:10pt}
-  .pr-kpi span{font-size:8pt;color:#555}
-  .pr-section{margin-top:4mm}
-  .pr-section h2{font-size:11pt;margin:0 0 2.5mm;padding-bottom:1.5mm;border-bottom:0.25mm solid #aaa}
-  .pr-table{width:100%;border-collapse:collapse;font-size:8.5pt}
-  .pr-table th,.pr-table td{border:0.25mm solid #bbb;padding:2mm 2.2mm;text-align:left;vertical-align:top}
-  .pr-table th{background:#efefef}
-  .pr-notes{margin-top:4mm;display:grid;grid-template-columns:1fr 1fr;gap:3mm;font-size:8.5pt}
-  .pr-note{border:0.25mm solid #bbb;padding:2.5mm;min-height:20mm}
-  .pr-footer{
-    margin-top:5mm;padding-top:2mm;border-top:0.25mm solid #bbb;font-size:7.5pt;color:#666;
-    display:flex;justify-content:space-between;
-  }
+  .pr-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:3mm;margin-bottom:5mm}.pr-kpi{border:0.25mm solid #bbb;padding:2.5mm;min-height:16mm}.pr-kpi strong{display:block;font-size:10pt}.pr-kpi span{font-size:8pt;color:#555}
+  .pr-section{margin-top:4mm}.pr-section h2{font-size:11pt;margin:0 0 2.5mm;padding-bottom:1.5mm;border-bottom:0.25mm solid #aaa}
+  .pr-table{width:100%;border-collapse:collapse;font-size:8.5pt}.pr-table th,.pr-table td{border:0.25mm solid #bbb;padding:2mm 2.2mm;text-align:left;vertical-align:top}.pr-table th{background:#efefef}
+  .pr-notes{margin-top:4mm;display:grid;grid-template-columns:1fr 1fr;gap:3mm;font-size:8.5pt}.pr-note{border:0.25mm solid #bbb;padding:2.5mm;min-height:20mm}
+  .pr-footer{margin-top:5mm;padding-top:2mm;border-top:0.25mm solid #bbb;font-size:7.5pt;color:#666;display:flex;justify-content:space-between}
 }
-
-@media(max-width:1100px){
-  .main{grid-template-columns:210px minmax(0,1fr) 225px}
-  .brand .meta{display:none}
-}
+@media(max-width:1200px){.main{grid-template-columns:240px minmax(0,1fr) 250px}}
 </style>
-
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 </head>
@@ -162,7 +84,7 @@ footer{
   <header>
     <div class="brand">
       <h1>Isla comedor</h1>
-      <div id="modelMeta" class="meta">1500 × 700 × 900 mm · patas 3×3" · cubierta finger joint 30 mm</div>
+      <div id="modelMeta" class="meta"></div>
     </div>
     <div class="header-actions">
       <button id="btnDespiece">Despiece</button>
@@ -170,34 +92,22 @@ footer{
       <button id="btnExportar">Exportar</button>
     </div>
   </header>
-
   <main class="main">
     <aside class="side">
-      <div class="side-head"><span>Especificación</span><span>fija</span></div>
+      <div class="side-head"><span>Especificación</span><span>versiones</span></div>
       <div class="left-body">
-        <div class="info-box"><strong>Medidas generales</strong><br>
-          Largo: 1500 mm<br>
-          Profundidad: 700 mm<br>
-          Altura total: 900 mm
+        <div>
+          <label for="modelVariant" style="font-size:12px;font-weight:700">Versión del mueble</label>
+          <select id="modelVariant">
+            <option value="finger">Finger joint 1500 × 700 × 30</option>
+            <option value="oak">Roble 1900 × 750 × 50,8</option>
+          </select>
         </div>
-        <div id="legSpec" class="info-box"><strong>Patas</strong><br>
-          3×3" = 76,2 × 76,2 mm<br>
-          Altura: 870 mm
-        </div>
-        <div id="topSpec" class="info-box"><strong>Cubierta</strong><br>
-          Finger joint 1500 × 700 × 30 mm
-        </div>
-        <div class="info-box"><strong>Apoyapiés longitudinal</strong><br>
-          1 pieza de 2×2" = 50,8 × 50,8 mm<br>
-          Cara superior a 200 mm del piso
-        </div>
-        <div class="info-box"><strong>Travesaños superiores</strong><br>
-          2×3": 76,2 × 50,8 mm<br>Marco 1400 × 600 mm + 1 travesaño central
-        </div>
-        <div class="info-box"><strong>Refuerzo sugerido</strong><br>
-          Escuadras interiores bajo la cubierta<br>
-          4 unidades
-        </div>
+        <div id="topSpec" class="info-box"></div>
+        <div id="legSpec" class="info-box"></div>
+        <div id="frameSpec" class="info-box"></div>
+        <div id="footSpec" class="info-box"></div>
+        <div id="supportSpec" class="info-box"></div>
         <div class="quick">
           <button id="btnExplode">Explotada</button>
           <button id="btnFit">Encajar</button>
@@ -205,7 +115,6 @@ footer{
         <div id="summary" class="info-box"></div>
       </div>
     </aside>
-
     <section class="center">
       <div class="viewer-toolbar">
         <div class="left">
@@ -216,9 +125,7 @@ footer{
           <button data-view="right">Der.</button>
           <button data-view="top">Arriba</button>
         </div>
-        <div class="right">
-          <button id="btnClearSel">Quitar selección</button>
-        </div>
+        <div class="right"><button id="btnClearSel">Quitar selección</button></div>
       </div>
       <div id="stage">
         <div class="hud">
@@ -228,7 +135,6 @@ footer{
         </div>
       </div>
     </section>
-
     <aside class="side">
       <div class="side-head"><span>Piezas</span><span id="partsCount">0</span></div>
       <div id="partsList" class="parts"></div>
@@ -240,7 +146,6 @@ footer{
       </div>
     </aside>
   </main>
-
   <footer>
     <span id="status">Inicializando visor…</span>
     <span>Three.js · medidas en mm · secciones nominales en pulgadas</span>
@@ -251,53 +156,31 @@ footer{
   <div class="pr-header">
     <div>
       <div class="pr-title">Isla comedor - ficha de fabricación</div>
-      <div id="prSubtitle" class="pr-sub"></div>
+      <div id="ptSubtitle" class="pr-sub"></div>
     </div>
-    <div class="pr-id">Modelo a escala<br>Vista isométrica</div>
+    <div class="pr-id">Modelo paramétrico<br>Vista isométrica</div>
   </div>
-
-  <div class="pr-figure">
-    <img id="prImage" alt="Vista isométrica de la isla comedor">
-  </div>
-
+  <div class="pr-figure"><img id="prImage" alt="Vista isométrica de la isla comedor"></div>
   <div class="pr-kpis">
     <div class="pr-kpi"><strong id="prL"></strong><span>Largo total</span></div>
     <div class="pr-kpi"><strong id="prD"></strong><span>Profundidad</span></div>
     <div class="pr-kpi"><strong id="prH"></strong><span>Altura total</span></div>
     <div class="pr-kpi"><strong id="prLeg"></strong><span>Sección patas</span></div>
   </div>
-
   <div class="pr-section">
     <h2>Despiece</h2>
-    <table class="pr-table">
-      <thead><tr><th>Código</th><th>Pieza</th><th>Cant.</th><th>Medida</th></tr></thead>
-      <tbody id="prCutList"></tbody>
-    </table>
+    <table class="pr-table"><thead><tr><th>Código</th><th>Pieza</th><th>Cant.</th><th>Medida</th></tr></thead><tbody id="prCutList"></tbody></table>
   </div>
-
   <div class="pr-notes">
-    <div class="pr-note">
-      <strong>Geometría</strong>
-      <div id="prGeometry" style="margin-top:2mm"></div>
-    </div>
-    <div class="pr-note">
-      <strong>Configuración</strong>
-      <div id="prConfig" style="margin-top:2mm"></div>
-    </div>
+    <div class="pr-note"><strong>Geometría</strong><div id="prGeometry" style="margin-top:2mm"></div></div>
+    <div class="pr-note"><strong>Configuración</strong><div id="prConfig" style="margin-top:2mm"></div></div>
   </div>
-
-  <div class="pr-footer">
-    <span>Cubierta finger joint de 30 mm · verificar medidas reales antes de cortar.</span>
-    <span>Todas las medidas en mm.</span>
-  </div>
+  <div class="pr-footer"><span>Documento generado desde el modelo paramétrico.</span><span>Todas las medidas en mm.</span></div>
 </section>
 
 <div id="modal" class="modal">
   <div class="modal-card">
-    <div class="modal-head">
-      <h2 id="modalTitle">Detalle</h2>
-      <button id="modalClose">Cerrar</button>
-    </div>
+    <div class="modal-head"><h2 id="modalTitle">Detalle</h2><button id="modalClose">Cerrar</button></div>
     <div id="modalBody" class="modal-body"></div>
   </div>
 </div>
@@ -306,355 +189,245 @@ footer{
 (function(){
   const $=id=>document.getElementById(id);
   const stage=$('stage');
-  const modal=$('modal');
-  const modalTitle=$('modalTitle');
-  const modalBody=$('modalBody');
-
+  const modal=$('modal'), modalTitle=$('modalTitle'), modalBody=$('modalBody');
+  if(typeof THREE!=='object' && typeof THEEE!=='function'){}
   if(typeof THREE==='undefined' || typeof THREE.OrbitControls==='undefined'){
     stage.innerHTML='<div style="padding:20px;color:#8a2a2a">No se pudo cargar Three.js. Este HTML necesita internet para el visor 3D.</div>';
     $('status').textContent='Error al cargar Three.js';
     return;
   }
 
-  function P(){
+  const CONFIGS={
+    fingera:{
+      key:'fingera',name:'Finger joint 1500 × 700 × 30',L:1500,D:700,H:900,top:30,
+      topLabel:'Cubierta finger joint',topMaterial:'Finger joint',
+      legW:76.2,legD:76.2,legLabel:'3×3"',
+      railT:50.8,railH:76.2,railLabel:'2×3"',
+      lowerT:50.8,lowerH:76.2,lowerLabel:'2×3"',
+      footW:50.8,footH:50.8,footLabel:'2÷2"',
+      footTop:220,
+      upperCrossCount:1,
+      notes:'Versión compacta ya definida para 4 personas ocasionales.'
+    },
+    oak:{
+      key:'oak',name:'Roble 1900 × 750 × 50,8',L:1900,D:750,H:900,top:50.8,
+      topLabel:'Cubierta roble macizo',topMaterial:'Roble 2"',
+      legW:101.6,legD:101.6,legLabel:'4÷4"',
+      railT:50.8,railH:101.6,railLabel:'2÷4"',
+      lowerT:50.8,lowerH:101.6,lowerLabel:'2÷4"',
+      footW:50.8,footH:76.2,footLabel:'2×3"',
+      footTop:230,
+      upperCrossCount:2,
+      notes:'Versión más larga y pesada; se refuerza con patas 4×4 y dos travesaños centrales superiores.'
+    }
+  };
+
+  let modelVariant='finger';
+  function P(){ return {...CONFIGS[modelVariant]}; }
+  function DD(a){
     return {
-      L:1500,D:700,H:900,
-      frameL:1400,frameD:600,
-      legW:76.2,legD:76.2,
-      top:30,
-      railW:50.8,railH:76.2,
-      foot:50.8,footTop:200,footY:174.6,
-      legSection:'3×3″'
+      legH: +(a.H-a.top).toFixed(1),
+      long: +(a.L-2*a.legW).toFixed(1),
+      short: +(a.D-2*a.legD).toFixed(1),
+      crossY: +(a.H-a.top-a.railH/2).toFixed(1),
+      lowerY: +(a.footTop-a.lowerH/2).toFixed(1),
+      footY: +(a.footTop-a.footH/2).toFixed(1)
     };
   }
-  function DD(a){ return {legH:a.H-a.top,long:a.frameL-2*a.legW,short:a.frameD-2*a.legD,supportShort:a.frameD-a.legD-a.railW,footLong:a.frameL-a.legW-a.railW}; }
+  function fmt(n){ return Number.isInteger(n)? String(n) : n.toFixed(1); }
 
   function partDefs(){
-    const a=P(),b=DD(a),x=a.frameL/2-a.legW/2,z=a.frameD/2-a.legD/2;
-    const railY=b.legH-a.railH/2,defs=[];
-    defs.push({id:'P01',code:'P01',name:'Cubierta finger joint',size:[a.L,a.top,a.D],pos:[0,a.H-a.top/2,0],explode:[0,180,0]});
-    [['FL',-x,z,'frontal izquierda'],['FR',x,z,'frontal derecha'],['BL',-x,-z,'trasera izquierda'],['BR',x,-z,'trasera derecha']].forEach(([id,px,pz,name])=>defs.push({id:`P02-${id}`,code:'P02',name:`Pata ${name}`,size:[a.legW,b.legH,a.legD],pos:[px,b.legH/2,pz],explode:[Math.sign(px)*100,0,Math.sign(pz)*90]}));
-    [-1,1].forEach(sign=>{
-      defs.push({id:`T01-${sign}`,code:'T01',name:`Larguero superior ${sign===1?'frontal':'trasero'}`,size:[b.long,a.railH,a.railW],pos:[0,railY,sign*z],explode:[0,40,sign*80]});
-      defs.push({id:`T02-${sign}`,code:'T02',name:`Lateral superior ${sign===1?'derecho':'izquierdo'}`,size:[a.railW,a.railH,b.short],pos:[sign*(a.frameL/2-a.railW/2),railY,0],explode:[sign*80,40,0]});
-      defs.push({id:`A02-${sign}`,code:'A02',name:`Lateral inferior ${sign===1?'derecho':'izquierdo'}`,size:[a.railW,a.railH,b.short],pos:[sign*x,a.footTop-a.railH/2,0],explode:[sign*80,0,0]});
-    });
-    defs.push({id:'T03',code:'T03',name:'Travesaño central superior',size:[a.railW,a.railH,b.supportShort],pos:[0,railY,0],explode:[0,80,0]});
-    defs.push({id:'A01',code:'A01',name:'Apoyapiés longitudinal',size:[b.footLong,a.foot,a.foot],pos:[0,a.footY,0],explode:[0,-40,0]});
-    const sections={P01:'Finger joint · 30 mm',P02:a.legSection,T01:'2×3″',T02:'2×3″',T03:'2×3″',A02:'2×3″',A01:'2×2″'};
-    return defs.map(def=>({...def,sectionInches:sections[def.code]}));
-  }
-
-  function cutList(){
-    const a=P(), b=DD(a),f=n=>n.toFixed(1);
-    return [
-      ['P01','Cubierta finger joint',1,`${a.L} × ${a.D} × ${a.top} mm`],
-      ['P02',`Patas ${a.legSection}`,4,`${f(b.legH)} × ${f(a.legW)} × ${f(a.legD)} mm`],
-      ['T01','Largueros superiores 2×3"',2,`${f(b.long)} × ${f(a.railW)} × ${f(a.railH)} mm`],
-      ['T02','Laterales superiores 2×3"',2,`${f(b.short)} × ${f(a.railW)} × ${f(a.railH)} mm`],
-      ['T03','Travesaño central superior 2×3"',1,`${f(b.supportShort)} × ${f(a.railW)} × ${f(a.railH)} mm`],
-      ['A02','Laterales inferiores 2×3"',2,`${f(b.short)} × ${f(a.railW)} × ${f(a.railH)} mm`],
-      ['A01','Apoyapiés longitudinal 2×2"',1,`${f(b.footLong)} × ${f(a.foot)} × ${f(a.foot)} mm`]
+    const a=P(), b=DD(a), x=a.L/2-a.legW/2, z=a.D/2-a.legD/2;
+    const defs=[
+      {id:'P01',code:'P01',name:a.topLabel,size:[a.L,a.top,a.D],pos:[0,a.H-a.top/2,0],explode:[0,180,0],kind:'top'},
+      {id:'P02-FL',code:'P02',name:'Pata frontal izquierda',size:[a.legW,b.legH,a.legD],pos:[-x,b.legH/2,z],explode:[-110,0,95],kind:'base'},
+      {id:'P02-FR',code:'P02',name:'Pata frontal derecha',size:[a.legW,b.legH,a.legD],pos:[x,b.legH/2,z],explode:[110,0,95],kind:'base'},
+      {id:'P02-BL',code:'P02',name:'Pata trasera izquierda',size:[a.legW,b.legH,a.legD],pos:[-x,b.legH/2,-z],explode:[-110,0,-95],kind:'base'},
+      {id:'P02-BR',code:'P02',name:'Pata trasera derecha',size:[a.legW,b.legH,a.legD],pos:[x,b.legH/2,-z],explode:[110,0,-95],kind:'base'},
+      {id:'T01-F',code:'T01',name:'Travesaño superior frontal',size:[b.long,a.railH,a.railT],pos:[0,b.crossY,z],explode:[0,40,85],kind:'base'},
+      {id:'T01-B',code:'T01',name:'Travesaño superior trasero',size:[b.long,a.railH,a.railT],pos:[0,b.crossY,-z],explode:[0,40,-85],kind:'base'},
+      {id:'T02-L',code:'T02',name:'Travesaño superior lateral izquierdo',size:[a.railT,a.railH,b.short],pos:[-x,b.crossY,0],explode:[-80,40,0],kind:'base'},
+      {id:'T02-R',code:'T02',name:'Travesaño superior lateral derecho',size:[a.railT,a.railH,b.short],pos:[x,b.crossY,0],explode:[80,40,0],kind:'base'},
+      {id:'A02-L',code:'A02',name:'Travesaño inferior lateral izquierdo',size:[a.lowerT,a.lowerH,b.short],pos:[-x,b.lowerY,0],explode:[-80,-20,0],kind:'base'},
+      {id:'A02-R',code:'A02',name:'Travesaño inferior lateral derecho',size:[a.lowerT,a.lowerH,b.short],pos:[x,b.lowerY,0],explode:[80,-20,0],kind:'base'},
+      {id:'A01',code:'A01',name:'Apoyapiés longitudinal',size:[b.long,a.footH,a.footW],pos:[0,b.footY,0],explode:[0,-50,0],kind:'base'}
     ];
+    const n=a.upperCrossCount;
+    const positions=n===1?[0]:n===2?[-b.long/4,b.long/4]:[-b.long/3,0,b.long/3];
+    positions.forEach((px,i)=>{
+      defs.push({id:`T03-${i+1}`,code:'T03',name:n===1?'Travesaño central superior':`Travesaño superior interior ${i+1}`,size:[a.railT,a.railH,b.short],pos:[px,b.crossY,0],explode:[0,90,(i-(n-1)/2)*50],kind:'base'});
+    });
+    return defs;
   }
 
-  const scene=new THREE.Scene();
-  scene.background=new THREE.Color(0xf3f0ea);
+  function aggregateCutList(){
+    const byKey=new Map();
+    for(const part of partDefs()){
+      const key=part.code+'|'+part.name+'|'+part.size.join('x');
+      if(!byKey.has(key)) byKey.set(key,{code:part.code,name:part.name,count:0,size:part.size});
+      byKey.get(key).count += 1;
+    }
+    return [...byKey.values()].map(item=>{
+      const [x,y,z]=item.size;
+      return [item.code,item.name,item.count,`${fmt(x)} × ${fmt(z)} × ${fmt(y)} mm`];
+    });
+  }
 
-  const camera=new THREE.PerspectiveCamera(35,1,1,10000);
-  const renderer=(()=>{try{return new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});}catch(error){stage.innerHTML='<div style="padding:20px;color:#8a2a2a">No se pudo iniciar WebGL. Activa la aceleración gráfica del navegador y recarga el visor.</div>';$('status').textContent='WebGL no disponible';return null;}})();
-  if(!renderer) return;
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
-  renderer.shadowMap.enabled=true;
-  renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  const scene=new THREE.Scene(); scene.background=new THREE.Color(0xf3efe9);
+  const camera=new THREE.PerspectiveCamera(45,1,.1,10000);
+  const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
+  renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   stage.appendChild(renderer.domElement);
-
   const controls=new THREE.OrbitControls(camera,renderer.domElement);
-  controls.enableDamping=true;
-  controls.minDistance=700;
-  controls.maxDistance=7000;
-
-  scene.add(new THREE.HemisphereLight(0xffffff,0x766f67,2.0));
-  const dl=new THREE.DirectionalLight(0xffffff,3.2);
-  dl.position.set(1800,2600,1700);
-  dl.castShadow=true;
-  scene.add(dl);
-
-  const floor=new THREE.Mesh(
-    new THREE.PlaneGeometry(6500,5200),
-    new THREE.MeshStandardMaterial({color:0xded8cf,roughness:1})
-  );
-  floor.rotation.x=-Math.PI/2;
-  floor.receiveShadow=true;
-  scene.add(floor);
+  controls.enableDamping=true; controls.dampingFactor=.08; controls.maxPolarAngle=Math.PI*.495;
+  const hemi=new THREE.HemisphereLight(0xffffff,0xb9b1a4,1.15); scene.add(hemi);
+  const dir=new THREE.DirectionalLight(0xffffff,.95); dir.position.set(900,1600,1100); dir.castShadow=true; scene.add(dir);
+  const dir2=new THREE.DirectionalLight(0xffffff,.35); dir2.position.set(-900,700,-800); scene.add(dir2);
+  const ground=new THREE.Mesh(new THREE.PlaneGeometry(10000,10000),new THREE.ShadowMaterial({opacity:.12})); ground.rotation.x=-Math.PI/2; ground.position.y=0; ground.receiveShadow=true; scene.add(ground);
 
   let group=new THREE.Group(); scene.add(group);
-  let selectedId=null, isolatedId=null, exploded=false;
-  let hiddenIds=new Set(), meshById=new Map();
+  let selectedId=null, isolatedId=null, exploded=false, hiddenIds=new Set(), meshById=new Map();
 
-  function materialFor(id){
-    const sel=id===selectedId;
+  function materialFor(def){
+    const sel=def.id===selectedId;
+    const isTop=def.kind==='top';
     return new THREE.MeshStandardMaterial({
-      color: sel ? 0xf59e0b : 0x171717,
-      roughness:.72,
+      color: sel ? 0xf59e0b : (isTop ? 0x9f7b59 : 0x171717),
+      roughness: isTop ? .78 : .7,
+      metalness: isTop ? .02 : .05,
       transparent:true,
       opacity:selectedId && !sel ? .34 : 1,
-      emissive: sel ? 0x5a3100 : 0x000000,
-      emissiveIntensity: sel ? .42 : 0
+      emissive:sel ? 0x5a3100 : 0x000000,
+      emissiveIntensity:sel ? .42 : 0
     });
   }
-
   function clearGroup(){
     group.traverse(o=>{ if(o.geometry) o.geometry.dispose(); if(o.material) o.material.dispose(); });
-    scene.remove(group);
-    group=new THREE.Group();
-    scene.add(group);
-    meshById.clear();
+    scene.remove(group); group=new THREE.Group(); scene.add(group); meshById.clear();
   }
-
   function rebuild(doFit=true){
     clearGroup();
     partDefs().forEach(def=>{
-      const mesh=new THREE.Mesh(new THREE.BoxGeometry(def.size[0],def.size[1],def.size[2]), materialFor(def.id));
+      const mesh=new THREE.Mesh(new THREE.BoxGeometry(...def.size),materialFor(def));
       mesh.userData=def;
-      const e=exploded ? def.explode : [0,0,0];
-      mesh.position.set(def.pos[0]+e[0], def.pos[1]+e[1], def.pos[2]+e[2]);
+      const e=exploded?def.explode:[0,0,0];
+      mesh.position.set(def.pos[0]+e[0],def.pos[1]+e[1],def.pos[2]+e[2]);
       mesh.castShadow=true; mesh.receiveShadow=true;
       mesh.visible=!hiddenIds.has(def.id)&&(!isolatedId||isolatedId===def.id);
-      group.add(mesh);
-      meshById.set(def.id, mesh);
+      group.add(mesh); meshById.set(def.id,mesh);
     });
-    renderUI();
-    if(doFit) fitCamera();
+    renderUI(); if(doFit) fitCamera();
   }
-
   function renderUI(){
-    const defs=partDefs(), a=P(), b=DD(a);
-    $('modelMeta').textContent=`1500 × 700 × 900 mm · patas ${a.legSection} · cubierta finger joint ${a.top} mm`;
-    $('legSpec').innerHTML=`<strong>Patas</strong><br>${a.legSection} = ${a.legW} × ${a.legD} mm<br>Altura: ${b.legH} mm`;
-    $('topSpec').innerHTML=`<strong>Cubierta</strong><br>Finger joint ${a.L} × ${a.D} × ${a.top} mm`;
+    const defs=partDefs(), a=P(), b=DD(a), cut=aggregateCutList();
     $('partsCount').textContent=defs.length;
-    $('partsList').innerHTML = defs.map(def=>`
-      <div class="part ${def.id===selectedId?'selected':''}" data-id="${def.id}">
-        <div class="part-top">
-          <div class="part-name">${def.name}</div>
-          <div class="part-code">${def.code}</div>
-        </div>
-        <div class="part-dim"><strong>${def.sectionInches}</strong></div>
-        <div class="part-dim">${Math.round(def.size[0]*10)/10} × ${Math.round(def.size[2]*10)/10} × ${Math.round(def.size[1]*10)/10} mm</div>
-      </div>
-    `).join('');
+    $('partsList').innerHTML=defs.map(def=>`<div class="part ${def.id===selectedId?'selected':''}" data-id="${def.id}"><div class="part-top"><div class="part-name">${def.name}</div><div class="part-code">${def.code}</div></div><div class="part-dim">${Math.round(def.size[0])} × ${Math.round(def.size[2])} × ${Math.round(def.size[1])} mm</div></div>`).join('');
     document.querySelectorAll('.part').forEach(el=>el.onclick=()=>selectPart(el.dataset.id));
 
-    $('summary').innerHTML =
-      `<strong>Resumen geométrico</strong><br>`+
-      `Patas: ${a.legSection} = ${a.legW.toFixed(1)} × ${a.legD.toFixed(1)} mm<br>`+
-      `Altura pata: ${b.legH} mm<br>`+
-      `Luz longitudinal: ${b.long.toFixed(1)} mm<br>`+
-      `Luz lateral: ${b.short.toFixed(1)} mm<br>`+
-      `Apoyapiés: 2×2" = ${a.foot.toFixed(1)} × ${a.foot.toFixed(1)} mm`;
-
+    $('modelMeta').textContent=`${a.L} × ${a.D} × ${a.H} mm · patas ${a.legLabel} · cubierta ${a.topMaterial}`;
+    $('topSpec').innerHTML=`<strong>Cubierta</strong><br>${a.topMaterial}<br>${fmt(a.L)} × ${fmt(a.D)} × ${fmt(a.top)} mm`;
+    $('legSpec').innerHTML=`<strong>Patas</strong><br>${a.legLabel} = ${fmt(a.legW)} × ${fmt(a.legD)} mm<br>Altura: ${fmt(b.legH)} mm`;
+    $('frameSpec').innerHTML=`<strong>Marco superior</strong><br>${a.railLabel} = ${fmt(a.railT)} × ${fmt(a.railH)} mm<br>Luz interior: ${fmt(b.long)} × ${fmt(b.short)} mm`;
+    $('footSpec').innerHTML=`<strong>Base inferior</strong><br>Laterales: ${a.lowerLabel}<br>Apoyapiés longitudinal: ${a.footLabel} = ${fmt(a.footW)} × ${fmt(a.footH)} mm`;
+    $('supportSpec').innerHTML=`<strong>Refuerzos superiores</strong><br>${a.upperCrossCount} ${a.upperCrossCount===1?'travesaño central'*'travesaños interiores' } de ${a.railLabel}<br>${a.notes}`;
+    $('summary').innerHTML=`<strong>${a.name}</strong><br>Despiece agrupado: ${cut.length} líneas<br>Altura total: ${fmt(a.H)} mm<br>Largo útil entre patas: ${fmt(b.long)} mm<br>Profundidad útil entre patas: ${fmt(b.short)} mm<br>Apoyapiés: cara superior a ${fmt(a.footTop)} mm`;
+    $('btnExplode').classList.toggle('active',exploded);
     const sel=defs.find(x=>x.id===selectedId);
-    $('status').textContent=sel?`Seleccionado: ${sel.name}`:'Modelo listo';
-    $('btnExplode').classList.toggle('active', exploded);
+    $('status').textContent=sel?`Seleccionado: ${sel.name}`:`Modelo listo · ${a.name}`;
   }
-
   function selectPart(id){ selectedId=id; rebuild(false); }
-
   function fitCamera(){
-    const box=new THREE.Box3().setFromObject(group);
-    if(box.isEmpty()) return;
-    const size=new THREE.Vector3(), center=new THREE.Vector3();
-    box.getSize(size); box.getCenter(center);
-    const maxDim=Math.max(size.x,size.y,size.z);
-    let dist=maxDim/(2*Math.tan(camera.fov*Math.PI/360));
-    dist*=1.72;
-    camera.position.set(center.x+dist*.86, center.y+dist*.62, center.z+dist*.86);
-    controls.target.copy(center);
-    controls.update();
+    const box=new THREE.Box3().setFromObject(group); if(box.isEmpty()) return;
+    const size=new THREE.Vector3(), center=new THREE.Vector3(); box.getSize(size); box.getCenter(center);
+    const maxDim=Math.max(size.x,size.y,size.z); let dist=maxDim/(2*Math.ta(camera.fov*Math.PI/360)); dist*=1.78;
+    camera.position.set(center.x+dist*.86,center.y+dist*.62,center.z+dist*.86); controls.target.copy(center); controls.update();
   }
-
   function setView(v){
-    const box=new THREE.Box3().setFromObject(group), c=new THREE.Vector3(), s=new THREE.Vector3();
-    box.getCenter(c); box.getSize(s);
-    const dist=Math.max(s.x,s.y,s.z)*1.85;
-    if(v==='iso') camera.position.set(c.x+dist*.78,c.y+dist*.58,c.z+dist*.78);
-    if(v==='front') camera.position.set(c.x,c.y,c.z+dist);
-    if(v==='back') camera.position.set(c.x,c.y,c.z-dist);
-    if(v==='left') camera.position.set(c.x-dist,c.y,c.z);
-    if(v==='right') camera.position.set(c.x+dist,c.y,c.z);
-    if(v==='top') camera.position.set(c.x,c.y+dist,c.z+.01);
-    controls.target.copy(c);
-    controls.update();
+    const box=new THREE.Box3().setFromObject(group),c=new THREE.Vector3(),s=new THREE.Vector3(); box.getCenter(c); box.getSize(s); const dist=Math.max(s.x,s.y,s.z)*1.85;
+    if(v==='iso')camera.position.set(c.x+dist*.78,c.y+dist*.58,c.z+dist*.78);
+    if(v==='front')camera.position.set(c.x,c.y,c.z+dist);
+    if(v==='back')camera.position.set(c.x,c.y,c.z-dist);
+    if(v==='left')camera.position.set(c.x-dist,c.y,c.z);
+    if(v==='right')camera.position.set(c.x+dist,c.y,c.z);
+    if(v==='top')camera.position.set(c.x,c.y+dist,c.z+.01);
+    controls.target.copy(c); controls.update();
   }
-
   function openModal(title,body){ modalTitle.textContent=title; modalBody.innerHTML=body; modal.classList.add('open'); }
   function closeModal(){ modal.classList.remove('open'); }
-
   function detailsModal(){
-    const a=P(), b=DD(a);
-    openModal('Detalles del proyecto', `
-      <div class="modal-grid">
-        <div class="card"><strong>Dimensión general</strong><br>${a.L} × ${a.D} × ${a.H} mm</div>
-        <div class="card"><strong>Patas</strong><br>${a.legSection} = ${a.legW.toFixed(1)} × ${a.legD.toFixed(1)} × ${b.legH} mm</div>
-        <div class="card"><strong>Travesaños largos</strong><br>${b.long.toFixed(1)} mm entre patas</div>
-        <div class="card"><strong>Travesaños laterales</strong><br>${b.short.toFixed(1)} mm entre patas</div>
-        <div class="card"><strong>Cubierta</strong><br>${a.top} mm espesor</div>
-        <div class="card"><strong>Apoyapiés</strong><br>2×2" = ${a.foot.toFixed(1)} × ${a.foot.toFixed(1)} mm · cara superior a ${a.footTop} mm</div>
-      </div>
-    `);
+    const a=P(),b=DD(a);
+    openModal('Detalles del proyecto',`<div class="modal-grid">
+      <div class="card"><strong>Versión</strong><br>${a.name}</div>
+      <div class="card"><strong>Dimensión general</strong><br>${fmt(a.L)} × ${fmt(a.D)} × ${fmt(a.H)} mm</div>
+      <div class="card"><strong>Cubierta</strong><br>${a.topMaterial}<br>${fmt(a.L)} × ${fmt(a.D)} × ${fmt(a.top)} mm</div>
+      <div class="card"><strong>Patas</strong><br>${a.legLabel} = ${fmt(a.legW)} × ${fmt(a.legD)} × ${fmt(b.legH)} mm</div>
+      <div class="card"><strong>Marco superior</strong><br>${a.railLabel}<br>Largueros: ${fmt(b.long)} mm<br>Laterales: ${fmt(b.short)} mm</div>
+      <div class="card"><strong>Apoyapiés</strong><br>${a.footLabel} = ${fmt(a.footW)} × ${fmt(a.footH)} mm<br>Cara superior a ${fmt(a.footTop)} mm</div>
+      <div class="card"><strong>Refuerzos superiores</strong><br>${a.upperCrossCount} ${a.upperCrossCount===1?'travesaño':'travesaños'} interior${a.upperCrossCount===1?'':'es'}</div>
+      <div class="card"><strong>Nota estructural</strong><br>${a.notes}</div>
+    </div>`);
   }
-
   function cutModal(){
-    openModal('Despiece', `
-      <table class="table">
-        <thead><tr><th>Código</th><th>Pieza</th><th>Cant.</th><th>Medida</th></tr></thead>
-        <tbody>${cutList().map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td><td>${x[2]}</td><td>${x[3]}</td></tr>`).join('')}</tbody>
-      </table>
-    `);
+    openModal('Despiece',`<table class="table"><thead><tr><th>Código</th><th>Pieza</th><th>Cant.</th><th>Medida</th></tr></thead><tbody>${aggregateCutList().map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td><td>${x[2]}</td><td>${x[3]}</td></tr>`).join('')}</tbody></table>`);
   }
-
   function partModal(){
     const def=partDefs().find(x=>x.id===selectedId);
-    if(!def){
-      openModal('Pieza','<div class="card">Selecciona primero una pieza del listado o con doble clic sobre el modelo.</div>');
-      return;
-    }
-    openModal(def.name, `
-      <div class="modal-grid">
-        <div class="card"><strong>Código</strong><br>${def.code}</div>
-        <div class="card"><strong>ID</strong><br>${def.id}</div>
-        <div class="card"><strong>Sección nominal en pulgadas</strong><br>${def.sectionInches}</div>
-        <div class="card"><strong>Dimensión X</strong><br>${def.size[0].toFixed(1)} mm</div>
-        <div class="card"><strong>Dimensión Y</strong><br>${def.size[1].toFixed(1)} mm</div>
-        <div class="card"><strong>Dimensión Z</strong><br>${def.size[2].toFixed(1)} mm</div>
-        <div class="card"><strong>Centro XYZ</strong><br>${def.pos.map(v=>Math.round(v*10)/10).join(' / ')} mm</div>
-      </div>
-    `);
+    if(!def){ openModal('Pieza','Selecciona primero una pieza del listado o con doble clic sobre el modelo.'); return; }
+    openModal(def.name,`<div class="modal-grid">
+      <div class="card"><strong>Código</strong><br>${def.code}</div>
+      <div class="card"><strong>ID</strong><br>${def.id}</div>
+      <div class="card"><strong>Dimensión X</strong><br>${fmt(def.size[0])} mm</div>
+      <div class="card"><strong>Dimensión Y</strong><br>${fmt(def.size[1])} mm</div>
+      <div class="card"><strong>Dimensión Z</strong><br>${fmt(def.size[2])} mm</div>
+      <div class="card"><strong>Centro XYZ</strong><br>${def.pos.map(v=>Math.round(v)).join(' / ')} mm</div>
+    </div>`);
   }
-
   function download(name,mime,text){
-    const blob=new Blob([text],{type:mime});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');
-    a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(()=>URL.revokeObjectURL(url),1000);
+    const blob=new Blob([text],{type:mime}); const url=URL.createObjectURL(blob); const a=document.createElement('a');
+    a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.bemove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
   }
-
   function preparePrintReport(){
-    const a=P(), b=DD(a);
-
-    const oldPos=camera.position.clone();
-    const oldTarget=controls.target.clone();
-
-    const box=new THREE.Box3().setFromObject(group);
-    const c=new THREE.Vector3(), s=new THREE.Vector3();
-    box.getCenter(c); box.getSize(s);
-    const dist=Math.max(s.x,s.y,s.z)*1.85;
-
-    camera.position.set(c.x+dist*.78,c.y+dist*.58,c.z+dist*.78);
-    controls.target.copy(c);
-    controls.update();
-    renderer.render(scene,camera);
-    $('prImage').src=renderer.domElement.toDataURL('image/png');
-
-    camera.position.copy(oldPos);
-    controls.target.copy(oldTarget);
-    controls.update();
-    renderer.render(scene,camera);
-
-    $('prSubtitle').textContent=`${a.L} × ${a.D} × ${a.H} mm · patas ${a.legSection} · cubierta ${a.top} mm`;
-    $('prL').textContent=`${a.L} mm`;
-    $('prD').textContent=`${a.D} mm`;
-    $('prH').textContent=`${a.H} mm`;
-    $('prLeg').textContent=`${a.legW.toFixed(1)} × ${a.legD.toFixed(1)} mm`;
-    $('prCutList').innerHTML=cutList().map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td><td>${x[2]}</td><td>${x[3]}</td></tr>`).join('');
-    $('prGeometry').innerHTML=
-      `Altura pata: <strong>${b.legH}</strong><br>`+
-      `Luz longitudinal: <strong>${b.long.toFixed(1)}</strong><br>`+
-      `Luz lateral: <strong>${b.short.toFixed(1)}</strong><br>`+
-      `Cara superior apoyapiés: <strong>${a.footTop}</strong>`;
-    $('prConfig').innerHTML=
-      `Patas: <strong>${a.legSection} = ${a.legW.toFixed(1)} × ${a.legD.toFixed(1)} mm</strong><br>`+
-      `Apoyapiés: <strong>2×2" = ${a.foot.toFixed(1)} × ${a.foot.toFixed(1)} mm</strong><br>`+
-      `Cubierta: <strong>finger joint ${a.L} × ${a.D} × ${a.top} mm</strong><br>`+
-      `Marco exterior: <strong>${a.frameL} × ${a.frameD}</strong><br>`+
-      `Escuadras sugeridas: <strong>4</strong>`;
+    const a=P(),b=DD(a); const oldPos=camera.position.clone(); const oldTarget=controls.target.clone();
+    const box=new THREE.Box3().setFromObject(group), c=new THREE.Vector3(), s=new THREE.Vector3(); box.getCenter(c); box.getSize(s); const dist=Math.max(s.x,s.y,s.z)*1.85;
+    camera.position.set(c.x+dist*.78,c.y+dist*.58,c.z+dist*.78); controls.target.copy(c); controls.update(); renderer.render(scene,camera);
+    $('prImage').src=renderer.domElement.toDataURL('image/png'); camera.position.copy(oldPos); controls.target.copy(oldTarget); controls.update(); renderer.render(scene,camera);
+    $('prSubtitle').textContent=`${a.name} · ${fmt(a.L)} × ${fmt(a.D)} × ${fmt(a.H)} mm`;
+    $('prL').textContent=`${fmt(a.L)} mm`; $('prD').textContent=`${fmt(a.D)} mm`; $('prH').textContent=`${fmt(a.H)} mm`; $('prLeg').textContent=`${fmt(a.legW)} × ${fmt(a.legD)} mm`;
+    $('prCutList').innerHTML=aggregateCutList().map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td><td>${x[2]}</td><td>${x[3]}</td></tr>`).join('');
+    $('prGeometry').innerHTML=`Altura pata: <strong>${fmt(b.legH)}</strong><br>Luz longitudinal: <strong>${fmt(b.long)}</strong><br>Luz lateral: <strong>${fmt(b.short)}</strong><br>Altura apoyapiés: <strong>${fmt(a.footTop)}</strong>`;
+    $('prConfig').innerHTML=`Cubierta: <strong>${a.topMaterial}</strong><br>Patas: <strong>${a.legLabel}</strong><br>Marco superior: <strong>${a.railLabel}</strong><br>Refuerzos superiores: <strong>${a.upperCrossCount}</strong>`;
   }
-
+  window.addEventListener('beforeprint',preparePrintReport);
   function exportModal(){
-    openModal('Exportar', `
-      <div class="export-grid">
-        <button id="expCsv">Despiece CSV</button>
-        <button id="expJson">Proyecto JSON</button>
-        <button id="expPrint">Imprimir / PDF</button>
-        <button id="expClose">Cerrar</button>
-      </div>
-    `);
-    $('expCsv').onclick=()=>{
-      const rows=[['Codigo','Pieza','Cantidad','Medida'],...cutList()];
-      download('despiece_isla.csv','text/csv;charset=utf-8',rows.map(r=>r.join(';')).join('\n'));
-    };
-    $('expJson').onclick=()=>{
-      download('proyecto_isla.json','application/json;charset=utf-8',
-        JSON.stringify({project:'Isla comedor',parameters:P(),parts:partDefs(),cutList:cutList()},null,2)
-      );
-    };
+    openModal('Exportar',`<div class="export-grid"><button id="expCsv">Despiece CSV</button><button id="expJson">Proyecto JSON</button><button id="expPrint">Imprimir / PDF</button><button id="expClose">Cerrar</button></div>`);
+    $('expCsv').onclick=()=>{ const rows=[['Codigo','Pieza','Cantidad','Medida'],...aggregateCutList()]; download(`despiece_isla_${modelVariant}.csv`,'text/csv;charset=utf-8',rows.map(r=>r.join(';')).join('\n')); };
+    $('expJson').onclick=()=>{ download(`proyecto_isla_${modelVariant}.json`,'application/json;charset=utf-8',JSON.stringify({project:'Isla comedor',variant:modelVariant,parameters:P(),parts:partDefs(),cutList:aggregateCutList()},null,2)); };
     $('expPrint').onclick=()=>{ preparePrintReport(); setTimeout(()=>window.print(),80); };
     $('expClose').onclick=closeModal;
   }
 
   const raycaster=new THREE.Raycaster(), mouse=new THREE.Vector2();
   renderer.domElement.addEventListener('dblclick',e=>{
-    const r=renderer.domElement.getBoundingClientRect();
-    mouse.x=((e.clientX-r.left)/r.width)*2-1;
-    mouse.y=-((e.clientY-r.top)/r.height)*2+1;
-    raycaster.setFromCamera(mouse,camera);
-    const hit=raycaster.intersectObjects([...meshById.values()].filter(x=>x.visible),false)[0];
-    if(hit && hit.object && hit.object.userData) selectPart(hit.object.userData.id);
+    const r=renderer.domElement.getBoundingClientRect(); mouse.x=((e.clientX-r.left)/r.width)*2-1; mouse.y=-((e.clientY-r.top)/r.height)*2+1;
+    raycaster.setFromCamera(mouse,camera); const hit=raycaster.intersectObjects([...meshById.values()].filter(x=>x.visible),false)[0];
+    if(hit && hit.object && hit.object.userData && hit.object.userData.id) selectPart(hit.object.userData.id);
   });
 
+  $('modelVariant').onchange=()=>{ modelVariant=$('modelVariant').value; selectedId=null; isolatedId=null; hiddenIds.clear(); closeModal(); rebuild(true); };
   $('btnExplode').onclick=()=>{ exploded=!exploded; rebuild(false); };
   $('btnFit').onclick=fitCamera;
   $('btnClearSel').onclick=()=>{ selectedId=null; rebuild(false); };
   $('btnIsolate').onclick=()=>{ if(selectedId){ isolatedId=selectedId; rebuild(false); } };
   $('btnHide').onclick=()=>{ if(selectedId){ hiddenIds.add(selectedId); selectedId=null; rebuild(false); } };
   $('btnShowAll').onclick=()=>{ isolatedId=null; hiddenIds.clear(); rebuild(false); };
-  $('btnPartModal').onclick=partModal;
-  $('btnDetalles').onclick=detailsModal;
-  $('btnDespiece').onclick=cutModal;
-  $('btnExportar').onclick=exportModal;
-  $('modalClose').onclick=closeModal;
+  $('btnPartModal').onclick=partModal; $('btnDetalles').onclick=detailsModal; $('btnDespiece').onclick=cutModal; $('btnExportar').onclick=exportModal; $('modalClose').onclick=closeModal;
   modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
-  window.addEventListener('beforeprint',preparePrintReport);
-
-  document.querySelectorAll('[data-view]').forEach(b=>{
-    b.onclick=()=>{
-      document.querySelectorAll('[data-view]').forEach(x=>x.classList.remove('active'));
-      b.classList.add('active');
-      setView(b.dataset.view);
-    };
-  });
-
-  function resize(){
-    const r=stage.getBoundingClientRect(), w=Math.max(320,r.width), h=Math.max(320,r.height);
-    renderer.setSize(w,h,false);
-    camera.aspect=w/h;
-    camera.updateProjectionMatrix();
-  }
-  new ResizeObserver(resize).observe(stage);
-
-  resize();
-  rebuild();
-
-  (function loop(){
-    controls.update();
-    renderer.render(scene,camera);
-    requestAnimationFrame(loop);
-  })();
+  document.querySelectorAll('[data-view]').forEach(b=>{ b.onclick=()=>{ document.querySelectorAll('[data-view]').forEach(x=>x.classList.remove('active')); b.classList.add('active'); setView(b.dataset.view); }; });
+  const ro=new ResizeObserver(()=>{ const r=stage.getBoundingClientRect(); const w=Math.max(320,r.width), h=Math.max(320,r.height); renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); }); ro.observe(stage);
+  rebuild(true);
+  function animate(){ controls.update(); renderer.render(scene,camera); requestAnimationFrame(animate); }
+  animate();
 })();
 </script>
 </body>
 </html>
-
-
