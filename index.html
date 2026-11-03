@@ -156,7 +156,7 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
   <div class="pr-header">
     <div>
       <div class="pr-title">Isla comedor - ficha de fabricación</div>
-      <div id="ptSubtitle" class="pr-sub"></div>
+      <div id="prSubtitle" class="pr-sub"></div>
     </div>
     <div class="pr-id">Modelo paramétrico<br>Vista isométrica</div>
   </div>
@@ -190,7 +190,6 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
   const $=id=>document.getElementById(id);
   const stage=$('stage');
   const modal=$('modal'), modalTitle=$('modalTitle'), modalBody=$('modalBody');
-  if(typeof THREE!=='object' && typeof THEEE!=='function'){}
   if(typeof THREE==='undefined' || typeof THREE.OrbitControls==='undefined'){
     stage.innerHTML='<div style="padding:20px;color:#8a2a2a">No se pudo cargar Three.js. Este HTML necesita internet para el visor 3D.</div>';
     $('status').textContent='Error al cargar Three.js';
@@ -198,13 +197,13 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
   }
 
   const CONFIGS={
-    fingera:{
+    finger:{
       key:'fingera',name:'Finger joint 1500 × 700 × 30',L:1500,D:700,H:900,top:30,
       topLabel:'Cubierta finger joint',topMaterial:'Finger joint',
       legW:76.2,legD:76.2,legLabel:'3×3"',
       railT:50.8,railH:76.2,railLabel:'2×3"',
       lowerT:50.8,lowerH:76.2,lowerLabel:'2×3"',
-      footW:50.8,footH:50.8,footLabel:'2÷2"',
+      footW:50.8,footH:50.8,footLabel:'2×2"',
       footTop:220,
       upperCrossCount:1,
       notes:'Versión compacta ya definida para 4 personas ocasionales.'
@@ -212,9 +211,9 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
     oak:{
       key:'oak',name:'Roble 1900 × 750 × 50,8',L:1900,D:750,H:900,top:50.8,
       topLabel:'Cubierta roble macizo',topMaterial:'Roble 2"',
-      legW:101.6,legD:101.6,legLabel:'4÷4"',
-      railT:50.8,railH:101.6,railLabel:'2÷4"',
-      lowerT:50.8,lowerH:101.6,lowerLabel:'2÷4"',
+      legW:101.6,legD:101.6,legLabel:'4×4"',
+      railT:50.8,railH:101.6,railLabel:'2×4"',
+      lowerT:50.8,lowerH:101.6,lowerLabel:'2×4"',
       footW:50.8,footH:76.2,footLabel:'2×3"',
       footTop:230,
       upperCrossCount:2,
@@ -329,7 +328,7 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
     $('legSpec').innerHTML=`<strong>Patas</strong><br>${a.legLabel} = ${fmt(a.legW)} × ${fmt(a.legD)} mm<br>Altura: ${fmt(b.legH)} mm`;
     $('frameSpec').innerHTML=`<strong>Marco superior</strong><br>${a.railLabel} = ${fmt(a.railT)} × ${fmt(a.railH)} mm<br>Luz interior: ${fmt(b.long)} × ${fmt(b.short)} mm`;
     $('footSpec').innerHTML=`<strong>Base inferior</strong><br>Laterales: ${a.lowerLabel}<br>Apoyapiés longitudinal: ${a.footLabel} = ${fmt(a.footW)} × ${fmt(a.footH)} mm`;
-    $('supportSpec').innerHTML=`<strong>Refuerzos superiores</strong><br>${a.upperCrossCount} ${a.upperCrossCount===1?'travesaño central'*'travesaños interiores' } de ${a.railLabel}<br>${a.notes}`;
+    $('supportSpec').innerHTML=`<strong>Refuerzos superiores</strong><br>${a.upperCrossCount} ${a.upperCrossCount===1?'travesaño central':'travesaños interiores'} de ${a.railLabel}<br>${a.notes}`;
     $('summary').innerHTML=`<strong>${a.name}</strong><br>Despiece agrupado: ${cut.length} líneas<br>Altura total: ${fmt(a.H)} mm<br>Largo útil entre patas: ${fmt(b.long)} mm<br>Profundidad útil entre patas: ${fmt(b.short)} mm<br>Apoyapiés: cara superior a ${fmt(a.footTop)} mm`;
     $('btnExplode').classList.toggle('active',exploded);
     const sel=defs.find(x=>x.id===selectedId);
@@ -339,7 +338,7 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
   function fitCamera(){
     const box=new THREE.Box3().setFromObject(group); if(box.isEmpty()) return;
     const size=new THREE.Vector3(), center=new THREE.Vector3(); box.getSize(size); box.getCenter(center);
-    const maxDim=Math.max(size.x,size.y,size.z); let dist=maxDim/(2*Math.ta(camera.fov*Math.PI/360)); dist*=1.78;
+    const maxDim=Math.max(size.x,size.y,size.z); let dist=maxDim/(2*Math.tan(camera.fov*Math.PI/360)); dist*=1.78;
     camera.position.set(center.x+dist*.86,center.y+dist*.62,center.z+dist*.86); controls.target.copy(center); controls.update();
   }
   function setView(v){
@@ -384,7 +383,7 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
   }
   function download(name,mime,text){
     const blob=new Blob([text],{type:mime}); const url=URL.createObjectURL(blob); const a=document.createElement('a');
-    a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.bemove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+    a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
   }
   function preparePrintReport(){
     const a=P(),b=DD(a); const oldPos=camera.position.clone(); const oldTarget=controls.target.clone();
