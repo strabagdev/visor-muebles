@@ -83,7 +83,7 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
 <div id="app">
   <header>
     <div class="brand">
-      <h1>Isla comedor</h1>
+      <h1 id="furnitureTitle">Escritorio</h1>
       <div id="modelMeta" class="meta"></div>
     </div>
     <div class="header-actions">
@@ -99,8 +99,8 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
         <div>
           <label for="modelVariant" style="font-size:12px;font-weight:700">Versión del mueble</label>
           <select id="modelVariant">
-            <option value="finger">Finger joint 1500 × 700 × 30</option>
-            <option value="oak">Roble 1900 × 750 × 50,8</option>
+            <option value="finger">Escritorio finger joint 1500 × 700 × 30</option>
+            <option value="oak">Isla de roble 1900 × 750 × 50,8</option>
           </select>
         </div>
         <div id="topSpec" class="info-box"></div>
@@ -155,7 +155,7 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
 <section id="printReport">
   <div class="pr-header">
     <div>
-      <div class="pr-title">Isla comedor - ficha de fabricación</div>
+      <div id="prTitle" class="pr-title">Ficha de fabricación</div>
       <div id="prSubtitle" class="pr-sub"></div>
     </div>
     <div class="pr-id">Modelo paramétrico<br>Vista isométrica</div>
@@ -198,7 +198,7 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
 
   const CONFIGS={
     finger:{
-      key:'finger',name:'Finger joint 1500 × 700 × 30',L:1500,D:700,H:900,top:30,
+      key:'finger',name:'Escritorio finger joint 1500 × 700 × 30',L:1500,D:700,H:750,top:30,
       topLabel:'Cubierta finger joint',topMaterial:'Finger joint',
       legW:76.2,legD:76.2,legLabel:'3×3"',
       railT:50.8,railH:76.2,railLabel:'2×3"',
@@ -207,10 +207,10 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
       footTop:220,
       overhangL:40, overhangD:30,
       upperCrossCount:1,
-      notes:'Versión compacta ya definida para 4 personas ocasionales.'
+      notes:'Escritorio de 750 mm de altura total, con patas de 720 mm. Altura sin niveladores.'
     },
     oak:{
-      key:'oak',name:'Roble 1900 × 750 × 50,8',L:1900,D:750,H:900,top:50.8,
+      key:'oak',name:'Isla de roble 1900 × 750 × 50,8',L:1900,D:750,H:950.8,top:50.8,
       topLabel:'Cubierta roble macizo',topMaterial:'Roble 2"',
       legW:101.6,legD:101.6,legLabel:'4×4"',
       railT:50.8,railH:101.6,railLabel:'2×4"',
@@ -323,6 +323,7 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
   }
   function renderUI(){
     const defs=partDefs(), a=P(), b=DD(a), cut=aggregateCutList();
+    $('furnitureTitle').textContent=modelVariant==='finger'?'Escritorio':'Isla comedor';
     $('partsCount').textContent=defs.length;
     $('partsList').innerHTML=defs.map(def=>`<div class="part ${def.id===selectedId?'selected':''}" data-id="${def.id}"><div class="part-top"><div class="part-name">${def.name}</div><div class="part-code">${def.code}</div></div><div class="part-dim">${Math.round(def.size[0])} × ${Math.round(def.size[2])} × ${Math.round(def.size[1])} mm</div></div>`).join('');
     document.querySelectorAll('.part').forEach(el=>el.onclick=()=>selectPart(el.dataset.id));
@@ -397,6 +398,7 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
     const box=new THREE.Box3().setFromObject(group), c=new THREE.Vector3(), s=new THREE.Vector3(); box.getCenter(c); box.getSize(s); const dist=Math.max(s.x,s.y,s.z)*1.85;
     camera.position.set(c.x+dist*.78,c.y+dist*.58,c.z+dist*.78); controls.target.copy(c); controls.update(); renderer.render(scene,camera);
     $('prImage').src=renderer.domElement.toDataURL('image/png'); camera.position.copy(oldPos); controls.target.copy(oldTarget); controls.update(); renderer.render(scene,camera);
+    $('prTitle').textContent=(modelVariant==='finger'?'Escritorio':'Isla comedor')+' - ficha de fabricación';
     $('prSubtitle').textContent=`${a.name} · ${fmt(a.L)} × ${fmt(a.D)} × ${fmt(a.H)} mm`;
     $('prL').textContent=`${fmt(a.L)} mm`; $('prD').textContent=`${fmt(a.D)} mm`; $('prH').textContent=`${fmt(a.H)} mm`; $('prLeg').textContent=`${fmt(a.legW)} × ${fmt(a.legD)} mm`;
     $('prCutList').innerHTML=aggregateCutList().map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td><td>${x[2]}</td><td>${x[3]}</td></tr>`).join('');
@@ -407,8 +409,8 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
   window.addEventListener('beforeprint',preparePrintReport);
   function exportModal(){
     openModal('Exportar',`<div class="export-grid"><button id="expCsv">Despiece CSV</button><button id="expJson">Proyecto JSON</button><button id="expPrint">Imprimir / PDF</button><button id="expClose">Cerrar</button></div>`);
-    $('expCsv').onclick=()=>{ const rows=[['Codigo','Pieza','Cantidad','Medida'],...aggregateCutList()]; download(`despiece_isla_${modelVariant}.csv`,'text/csv;charset=utf-8',rows.map(r=>r.join(';')).join('\n')); };
-    $('expJson').onclick=()=>{ download(`proyecto_isla_${modelVariant}.json`,'application/json;charset=utf-8',JSON.stringify({project:'Isla comedor',variant:modelVariant,parameters:P(),parts:partDefs(),cutList:aggregateCutList()},null,2)); };
+    $('expCsv').onclick=()=>{ const rows=[['Codigo','Pieza','Cantidad','Medida'],...aggregateCutList()]; download(`despiece_${modelVariant}.csv`,'text/csv;charset=utf-8',rows.map(r=>r.join(';')).join('\n')); };
+    $('expJson').onclick=()=>{ download(`proyecto_${modelVariant}.json`,'application/json;charset=utf-8',JSON.stringify({project:modelVariant==='finger'?'Escritorio':'Isla comedor',variant:modelVariant,parameters:P(),parts:partDefs(),cutList:aggregateCutList()},null,2)); };
     $('expPrint').onclick=()=>{ preparePrintReport(); setTimeout(()=>window.print(),80); };
     $('expClose').onclick=closeModal;
   }
