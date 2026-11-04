@@ -205,6 +205,7 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
       lowerT:50.8,lowerH:76.2,lowerLabel:'2×3"',
       footW:50.8,footH:50.8,footLabel:'2×2"',
       footTop:220,
+      overhangL:0, overhangD:0,
       upperCrossCount:1,
       notes:'Versión compacta ya definida para 4 personas ocasionales.'
     },
@@ -216,6 +217,7 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
       lowerT:50.8,lowerH:101.6,lowerLabel:'2×4"',
       footW:50.8,footH:76.2,footLabel:'2×3"',
       footTop:230,
+      overhangL:50, overhangD:40,
       upperCrossCount:2,
       notes:'Versión más larga y pesada; se refuerza con patas 4×4 y dos travesaños centrales superiores.'
     }
@@ -226,8 +228,10 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
   function DD(a){
     return {
       legH: +(a.H-a.top).toFixed(1),
-      long: +(a.L-2*a.legW).toFixed(1),
-      short: +(a.D-2*a.legD).toFixed(1),
+      frameL: +(a.L-2*(a.overhangL||0)).toFixed(1),
+      frameD: +(a.D-2*(a.overhangD||0)).toFixed(1),
+      long: +(a.L-2*(a.overhangL||0)-2*a.legW).toFixed(1),
+      short: +(a.D-2*(a.overhangD||0)-2*a.legD).toFixed(1),
       crossY: +(a.H-a.top-a.railH/2).toFixed(1),
       lowerY: +(a.footTop-a.lowerH/2).toFixed(1),
       footY: +(a.footTop-a.footH/2).toFixed(1)
@@ -236,7 +240,7 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
   function fmt(n){ return Number.isInteger(n)? String(n) : n.toFixed(1); }
 
   function partDefs(){
-    const a=P(), b=DD(a), x=a.L/2-a.legW/2, z=a.D/2-a.legD/2;
+    const a=P(), b=DD(a), x=b.frameL/2-a.legW/2, z=b.frameD/2-a.legD/2;
     const defs=[
       {id:'P01',code:'P01',name:a.topLabel,size:[a.L,a.top,a.D],pos:[0,a.H-a.top/2,0],explode:[0,180,0],kind:'top'},
       {id:'P02-FL',code:'P02',name:'Pata frontal izquierda',size:[a.legW,b.legH,a.legD],pos:[-x,b.legH/2,z],explode:[-110,0,95],kind:'base'},
@@ -324,12 +328,14 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
     document.querySelectorAll('.part').forEach(el=>el.onclick=()=>selectPart(el.dataset.id));
 
     $('modelMeta').textContent=`${a.L} × ${a.D} × ${a.H} mm · patas ${a.legLabel} · cubierta ${a.topMaterial}`;
-    $('topSpec').innerHTML=`<strong>Cubierta</strong><br>${a.topMaterial}<br>${fmt(a.L)} × ${fmt(a.D)} × ${fmt(a.top)} mm`;
+    $('topSpec').innerHTML=`<strong>Cubierta</strong><br>${a.topMaterial}<br>${fmt(a.L)} × ${fmt(a.D)} × ${fmt(a.top)} mm`+
+      ((a.overhangL||a.overhangD)?`<br>Volado: ${fmt(a.overhangL)} mm en extremos · ${fmt(a.overhangD)} mm en lados`:'');
     $('legSpec').innerHTML=`<strong>Patas</strong><br>${a.legLabel} = ${fmt(a.legW)} × ${fmt(a.legD)} mm<br>Altura: ${fmt(b.legH)} mm`;
-    $('frameSpec').innerHTML=`<strong>Marco superior</strong><br>${a.railLabel} = ${fmt(a.railT)} × ${fmt(a.railH)} mm<br>Luz interior: ${fmt(b.long)} × ${fmt(b.short)} mm`;
+    $('frameSpec').innerHTML=`<strong>Marco superior</strong><br>${a.railLabel} = ${fmt(a.railT)} × ${fmt(a.railH)} mm<br>Huella estructura: ${fmt(b.frameL)} × ${fmt(b.frameD)} mm<br>Luz interior: ${fmt(b.long)} × ${fmt(b.short)} mm`;
     $('footSpec').innerHTML=`<strong>Base inferior</strong><br>Laterales: ${a.lowerLabel}<br>Apoyapiés longitudinal: ${a.footLabel} = ${fmt(a.footW)} × ${fmt(a.footH)} mm`;
     $('supportSpec').innerHTML=`<strong>Refuerzos superiores</strong><br>${a.upperCrossCount} ${a.upperCrossCount===1?'travesaño central':'travesaños interiores'} de ${a.railLabel}<br>${a.notes}`;
-    $('summary').innerHTML=`<strong>${a.name}</strong><br>Despiece agrupado: ${cut.length} líneas<br>Altura total: ${fmt(a.H)} mm<br>Largo útil entre patas: ${fmt(b.long)} mm<br>Profundidad útil entre patas: ${fmt(b.short)} mm<br>Apoyapiés: cara superior a ${fmt(a.footTop)} mm`;
+    $('summary').innerHTML=`<strong>${a.name}</strong><br>Despiece agrupado: ${cut.length} líneas<br>Altura total: ${fmt(a.H)} mm<br>Huella estructura: ${fmt(b.frameL)} × ${fmt(b.frameD)} mm<br>Largo útil entre patas: ${fmt(b.long)} mm<br>Profundidad útil entre patas: ${fmt(b.short)} mm<br>Apoyapiés: cara superior a ${fmt(a.footTop)} mm`+
+      ((a.overhangL||a.overhangD)?`<br>Volado cubierta: ${fmt(a.overhangL)} / ${fmt(a.overhangD)} mm`:'');
     $('btnExplode').classList.toggle('active',exploded);
     const sel=defs.find(x=>x.id===selectedId);
     $('status').textContent=sel?`Seleccionado: ${sel.name}`:`Modelo listo · ${a.name}`;
@@ -359,6 +365,7 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
       <div class="card"><strong>Versión</strong><br>${a.name}</div>
       <div class="card"><strong>Dimensión general</strong><br>${fmt(a.L)} × ${fmt(a.D)} × ${fmt(a.H)} mm</div>
       <div class="card"><strong>Cubierta</strong><br>${a.topMaterial}<br>${fmt(a.L)} × ${fmt(a.D)} × ${fmt(a.top)} mm</div>
+      <div class="card"><strong>Volado / vuelo</strong><br>${(a.overhangL||a.overhangD)?`${fmt(a.overhangL)} mm en extremos · ${fmt(a.overhangD)} mm en lados`:'Sin volado'}</div>
       <div class="card"><strong>Patas</strong><br>${a.legLabel} = ${fmt(a.legW)} × ${fmt(a.legD)} × ${fmt(b.legH)} mm</div>
       <div class="card"><strong>Marco superior</strong><br>${a.railLabel}<br>Largueros: ${fmt(b.long)} mm<br>Laterales: ${fmt(b.short)} mm</div>
       <div class="card"><strong>Apoyapiés</strong><br>${a.footLabel} = ${fmt(a.footW)} × ${fmt(a.footH)} mm<br>Cara superior a ${fmt(a.footTop)} mm</div>
@@ -394,7 +401,8 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
     $('prL').textContent=`${fmt(a.L)} mm`; $('prD').textContent=`${fmt(a.D)} mm`; $('prH').textContent=`${fmt(a.H)} mm`; $('prLeg').textContent=`${fmt(a.legW)} × ${fmt(a.legD)} mm`;
     $('prCutList').innerHTML=aggregateCutList().map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td><td>${x[2]}</td><td>${x[3]}</td></tr>`).join('');
     $('prGeometry').innerHTML=`Altura pata: <strong>${fmt(b.legH)}</strong><br>Luz longitudinal: <strong>${fmt(b.long)}</strong><br>Luz lateral: <strong>${fmt(b.short)}</strong><br>Altura apoyapiés: <strong>${fmt(a.footTop)}</strong>`;
-    $('prConfig').innerHTML=`Cubierta: <strong>${a.topMaterial}</strong><br>Patas: <strong>${a.legLabel}</strong><br>Marco superior: <strong>${a.railLabel}</strong><br>Refuerzos superiores: <strong>${a.upperCrossCount}</strong>`;
+    $('prConfig').innerHTML=`Cubierta: <strong>${a.topMaterial}</strong><br>Patas: <strong>${a.legLabel}</strong><br>Marco superior: <strong>${a.railLabel}</strong><br>Refuerzos superiores: <strong>${a.upperCrossCount}</strong>`+
+      ((a.overhangL||a.overhangD)?`<br>Volado: <strong>${fmt(a.overhangL)} mm extremos · ${fmt(a.overhangD)} mm lados</strong>`:'');
   }
   window.addEventListener('beforeprint',preparePrintReport);
   function exportModal(){
