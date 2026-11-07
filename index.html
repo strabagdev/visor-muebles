@@ -213,12 +213,12 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
     coffee:{
       key:'coffee',name:'Mesa de centro finger joint 900 × 500 × 30',L:900,D:500,H:400,top:30,
       topLabel:'Cubierta finger joint de retazo',topMaterial:'Finger joint',
-      legW:50.8,legD:50.8,legLabel:'2×2"',
+      legW:66,legD:62,legLabel:'66 × 62 mm aprox.',
       railT:50.8,railH:76.2,railLabel:'2×3"',
       lowerT:50.8,lowerH:76.2,lowerLabel:'2×3"',
       footW:50.8,footH:50.8,footLabel:'2×2"',footTop:0,
       overhangL:30,overhangD:30,upperCrossCount:1,noLower:true,
-      notes:'Propuesta: cubierta de retazo 900 × 500 × 30 mm; patas de 370 mm, sección 2×2". Marco de madera 2×3" y un refuerzo superior; sin apoyapiés. Medidas nominales: verificar secciones reales y definir uniones antes de fabricar.'
+      notes:'Propuesta: cubierta de retazo 900 × 500 × 30 mm; patas de 370 mm propuestos, sección medida aproximada de 66 × 62 mm (66 mm al largo de la mesa). Marco de madera 2×3" y un refuerzo superior; sin apoyapiés. Medidas nominales: verificar secciones reales y definir uniones antes de fabricar.'
     },
     oak:{
       key:'oak',name:'Isla de roble 1900 × 750 × 50,8',L:1900,D:750,H:950.8,top:50.8,
@@ -273,6 +273,7 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
       defs.push({id:`T03-${i+1}`,code:'T03',name:n===1?'Travesaño central superior':`Travesaño superior interior ${i+1}`,size:[a.railT,a.railH,b.short],pos:[px,b.crossY,0],explode:[0,90,(i-(n-1)/2)*50],kind:'base'});
     });
     if(a.noLower){
+      defs.filter(p=>p.code==='T03').forEach(p=>{ p.size[2]=+(b.frameD-a.legD-a.railT).toFixed(1); });
       return defs.filter(p=>p.code!=='A01' && p.code!=='A02');
     }
     return defs;
