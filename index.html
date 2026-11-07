@@ -213,12 +213,13 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
     coffee:{
       key:'coffee',name:'Mesa de centro finger joint 900 × 500 × 30',L:900,D:500,H:400,top:30,
       topLabel:'Cubierta finger joint de retazo',topMaterial:'Finger joint',
-      legW:66,legD:62,legLabel:'66 × 62 mm aprox.',
+      legW:50.8,legD:50.8,legLabel:'2×2"',
+      crossT:50.8,crossH:50.8,crossLabel:'2×2"',
       railT:50.8,railH:76.2,railLabel:'2×3"',
       lowerT:50.8,lowerH:76.2,lowerLabel:'2×3"',
       footW:50.8,footH:50.8,footLabel:'2×2"',footTop:0,
       overhangL:30,overhangD:30,upperCrossCount:1,noLower:true,
-      notes:'Propuesta: cubierta de retazo 900 × 500 × 30 mm; patas de 370 mm propuestos, sección medida aproximada de 66 × 62 mm (66 mm al largo de la mesa). Marco de madera 2×3" y un refuerzo superior; sin apoyapiés. Medidas nominales: verificar secciones reales y definir uniones antes de fabricar.'
+      notes:'Propuesta: cubierta de retazo 900 × 500 × 30 mm; patas de 370 mm, sección 2×2". Marco perimetral 2×3" con 3" en vertical y un travesaño central superior 2×2" al ras bajo la cubierta; sin apoyapiés. Medidas nominales: verificar secciones reales y definir uniones antes de fabricar.'
     },
     oak:{
       key:'oak',name:'Isla de roble 1900 × 750 × 50,8',L:1900,D:750,H:950.8,top:50.8,
@@ -270,7 +271,7 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
     const n=a.upperCrossCount;
     const positions=n===1?[0]:n===2?[-b.long/4,b.long/4]:[-b.long/3,0,b.long/3];
     positions.forEach((px,i)=>{
-      defs.push({id:`T03-${i+1}`,code:'T03',name:n===1?'Travesaño central superior':`Travesaño superior interior ${i+1}`,size:[a.railT,a.railH,b.short],pos:[px,b.crossY,0],explode:[0,90,(i-(n-1)/2)*50],kind:'base'});
+      defs.push({id:`T03-${i+1}`,code:'T03',name:n===1?'Travesaño central superior':`Travesaño superior interior ${i+1}`,size:[a.crossT??a.railT,a.crossH??a.railH,b.short],pos:[px,a.H-a.top-(a.crossH??a.railH)/2,0],explode:[0,90,(i-(n-1)/2)*50],kind:'base'});
     });
     if(a.noLower){
       defs.filter(p=>p.code==='T03').forEach(p=>{ p.size[2]=+(b.frameD-a.legD-a.railT).toFixed(1); });
@@ -350,7 +351,7 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
     $('legSpec').innerHTML=`<strong>Patas</strong><br>${a.legLabel} = ${fmt(a.legW)} × ${fmt(a.legD)} mm<br>Altura: ${fmt(b.legH)} mm`;
     $('frameSpec').innerHTML=`<strong>Marco superior</strong><br>${a.railLabel} = ${fmt(a.railT)} × ${fmt(a.railH)} mm<br>Huella estructura: ${fmt(b.frameL)} × ${fmt(b.frameD)} mm<br>Luz interior: ${fmt(b.long)} × ${fmt(b.short)} mm`;
     $('footSpec').innerHTML=a.noLower?'<strong>Base inferior</strong><br>Sin apoyapiés ni travesaños inferiores.':`<strong>Base inferior</strong><br>Laterales: ${a.lowerLabel}<br>Apoyapiés longitudinal: ${a.footLabel} = ${fmt(a.footW)} × ${fmt(a.footH)} mm`;
-    $('supportSpec').innerHTML=`<strong>Refuerzos superiores</strong><br>${a.upperCrossCount} ${a.upperCrossCount===1?'travesaño central':'travesaños interiores'} de ${a.railLabel}<br>${a.notes}`;
+    $('supportSpec').innerHTML=`<strong>Refuerzos superiores</strong><br>${a.upperCrossCount} ${a.upperCrossCount===1?'travesaño central':'travesaños interiores'} de ${a.crossLabel??a.railLabel}<br>${a.notes}`;
     $('summary').innerHTML=`<strong>${a.name}</strong><br>Despiece agrupado: ${cut.length} líneas<br>Altura total: ${fmt(a.H)} mm<br>Huella estructura: ${fmt(b.frameL)} × ${fmt(b.frameD)} mm<br>Largo útil entre patas: ${fmt(b.long)} mm<br>Profundidad útil entre patas: ${fmt(b.short)} mm${a.noLower?'':`<br>Apoyapiés: cara superior a ${fmt(a.footTop)} mm`}`+
       ((a.overhangL||a.overhangD)?`<br>Volado cubierta: ${fmt(a.overhangL)} / ${fmt(a.overhangD)} mm`:'');
     $('btnExplode').classList.toggle('active',exploded);
@@ -386,7 +387,7 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
       <div class="card"><strong>Patas</strong><br>${a.legLabel} = ${fmt(a.legW)} × ${fmt(a.legD)} × ${fmt(b.legH)} mm</div>
       <div class="card"><strong>Marco superior</strong><br>${a.railLabel}<br>Largueros: ${fmt(b.long)} mm<br>Laterales: ${fmt(b.short)} mm</div>
       ${a.noLower?'':`<div class="card"><strong>Apoyapiés</strong><br>${a.footLabel} = ${fmt(a.footW)} × ${fmt(a.footH)} mm<br>Cara superior a ${fmt(a.footTop)} mm</div>`}
-      <div class="card"><strong>Refuerzos superiores</strong><br>${a.upperCrossCount} ${a.upperCrossCount===1?'travesaño':'travesaños'} interior${a.upperCrossCount===1?'':'es'}</div>
+      <div class="card"><strong>Refuerzos superiores</strong><br>${a.upperCrossCount} ${a.upperCrossCount===1?'travesaño':'travesaños'} interior${a.upperCrossCount===1?'':'es'} de ${a.crossLabel??a.railLabel}</div>
       <div class="card"><strong>Nota estructural</strong><br>${a.notes}</div>
     </div>`);
   }
@@ -420,7 +421,7 @@ footer{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
     $('prL').textContent=`${fmt(a.L)} mm`; $('prD').textContent=`${fmt(a.D)} mm`; $('prH').textContent=`${fmt(a.H)} mm`; $('prLeg').textContent=`${fmt(a.legW)} × ${fmt(a.legD)} mm`;
     $('prCutList').innerHTML=aggregateCutList().map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td><td>${x[2]}</td><td>${x[3]}</td></tr>`).join('');
     $('prGeometry').innerHTML=`Altura pata: <strong>${fmt(b.legH)}</strong><br>Luz longitudinal: <strong>${fmt(b.long)}</strong><br>Luz lateral: <strong>${fmt(b.short)}</strong>${a.noLower?'':`<br>Altura apoyapiés: <strong>${fmt(a.footTop)}</strong>`}`;
-    $('prConfig').innerHTML=`Cubierta: <strong>${a.topMaterial}</strong><br>Patas: <strong>${a.legLabel}</strong><br>Marco superior: <strong>${a.railLabel}</strong><br>Refuerzos superiores: <strong>${a.upperCrossCount}</strong>`+
+    $('prConfig').innerHTML=`Cubierta: <strong>${a.topMaterial}</strong><br>Patas: <strong>${a.legLabel}</strong><br>Marco superior: <strong>${a.railLabel}</strong><br>Refuerzos superiores: <strong>${a.upperCrossCount} de ${a.crossLabel??a.railLabel}</strong>`+
       ((a.overhangL||a.overhangD)?`<br>Volado: <strong>${fmt(a.overhangL)} mm extremos · ${fmt(a.overhangD)} mm lados</strong>`:'');
     if(a.noLower) $('prConfig').innerHTML+=`<br>${a.notes}`;
   }
